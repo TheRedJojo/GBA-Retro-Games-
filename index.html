@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>GBA - Games by Anto (NES Style)</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="website icon" type="png" href="img/logo.png">
+
+<style>
+:root{
+  --bg:#081018;
+  --panel:#0f1724;
+  --accent:#FFD27F;
+  --text:#EAE6DA;
+  --muted:#9AA6B2;
+}
+html, body {
+  margin:0; padding:0;
+  height:100%; width:100%;
+  overflow:hidden;
+  font-family:'Press Start 2P',monospace;
+  background:linear-gradient(180deg,var(--bg),#0b1220);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  touch-action:none;
+  -webkit-user-select:none; user-select:none;
+}
+*{box-sizing:border-box}
+
+/* container */
+.container{
+  width:95vw; max-width:420px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+  border:4px solid #111;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  border-radius:8px;
+  box-shadow:0 6px 0 #000;
+}
+
+/* left menu */
+.logo{
+  color:var(--accent);
+  font-size:14px;
+  letter-spacing:1px;
+  text-shadow:2px 2px #000;
+  text-align:center;
+}
+.title{font-size:11px;color:var(--accent); text-align:center;}
+.buttons{
+  display:flex; flex-direction:column; gap:10px; width:100%; align-items:center;
+}
+.btn{
+  width:90%;
+  padding:12px;
+  background:linear-gradient(180deg,#162034,#0f1a2b);
+  border:3px solid #000;
+  color:var(--text);
+  cursor:pointer;
+  text-align:center;
+  transition: transform .12s, background .12s;
+  border-radius:6px;
+  font-size:11px;
+}
+.btn:hover{ transform:translateY(-3px); background:linear-gradient(180deg,#FFD27F,#FFB86B); color:#000; }
+
+/* right preview */
+.preview{
+  width:100%;
+  background:linear-gradient(180deg,#091221,#08101b);
+  border:3px solid #000;
+  border-radius:6px;
+  position:relative;
+  overflow:hidden;
+  aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center;
+}
+.preview .game-title{
+  position:absolute; top:6px; left:6px;
+  color:var(--accent); font-size:11px;
+}
+
+/* scanlines */
+.preview::after{
+  content:"";
+  pointer-events:none;
+  position:absolute; inset:0;
+  background-image:linear-gradient(rgba(0,0,0,0.03) 50%, rgba(255,255,255,0.01) 51%);
+  background-size:100% 4px;
+  opacity:.45;
+}
+
+/* welcome overlay */
+#welcome{
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(180deg, rgba(2,6,12,.95), rgba(2,6,12,.95));
+  z-index:999;
+}
+.welcome-card{
+  width:90vw; max-width:360px;
+  padding:18px;
+  border:4px solid #000;
+  background:linear-gradient(180deg,#0f1724,#07101a);
+  text-align:center;
+  border-radius:6px;
+}
+.welcome-card h2{color:var(--accent); margin:0 0 12px 0; font-size:16px}
+.welcome-card p{font-size:11px; color:var(--text); line-height:1.4; margin:0 0 12px 0;}
+.welcome-card .ok{
+  display:inline-block; padding:10px 16px;
+  background:var(--accent); color:#000;
+  border-radius:6px; border:2px solid #000; cursor:pointer; font-size:11px;
+}
+.small{font-size:10px;color:var(--muted); margin-top:8px; text-align:center;}
+
+/* fixed footer/credits */
+.footer,.credits{
+  font-size:10px; color:var(--muted); position:fixed;
+}
+.footer{bottom:25px;align-items: center;}
+.credits{bottom:4px;align-items: center;}
+.scan{position:fixed; inset:0; pointer-events:none;
+  background-image:linear-gradient(rgba(0,0,0,0.03) 50%, rgba(255,255,255,0.01) 51%);
+  background-size:100% 4px; opacity:0.35;
+}
+</style>
+</head>
+<body>
+
+<!-- welcome overlay -->
+<div id="welcome">
+  <div class="welcome-card" role="dialog" aria-label="Benvenuto">
+    <h2>Benvenuto in GBA — Games by Anto</h2>
+    <p>
+      Versione Beta (1.0.0)<br>
+      Raccolta NES-style. Giochi inclusi: GeoBlocks (Tetris-like), PixelSnake, Tris.<br>
+      Premi OK per entrare nel portale.
+    </p>
+    <div style="display:flex;gap:12px;justify-content:center;">
+      <div class="ok" onclick="closeWelcome()">OK!</div>
+    </div>
+    <div class="small">Usa touch per giocare su mobile. I giochi sono ottimizzati per telefoni e tablet.</div>
+  </div>
+</div>
+
+<div class="container" id="main">
+  <div class="logo">GBA — Games By Anto</div>
+  <div class="title">Raccolta NES — Beta 1.0.0</div>
+
+  <div class="buttons">
+    <div class="btn" onclick="location.href='geoblocks.html'">GEO BLOCKS</div>
+    <div class="btn" onclick="location.href='snake.html'">PIXEL SNAKE</div>
+    <div class="btn" onclick="location.href='tris.html'">TRIS MANIA</div>
+  </div>
+
+  <div class="preview">
+    <div class="game-title">Preview</div>
+    <canvas id="previewCanvas" width="320" height="240" style="image-rendering:pixelated"></canvas>
+  </div>
+
+  <div class="small" style="margin-top:6px;">Seleziona un gioco per aprirlo. Tutte le pagine mantengono menu, pausa e crediti.</div>
+</div>
+
+<div class="scan"></div>
+<div class="footer">Versione Beta (1.0.0)</div>
+<div class="credits">Fatto da Anto e ChatGPT</div>
+
+<script>
+function closeWelcome(){ document.getElementById('welcome').style.display='none'; }
+
+/* small preview animation */
+const p = document.getElementById('previewCanvas');
+const pc = p.getContext('2d');
+function previewLoop(){
+  pc.fillStyle='#07101a'; pc.fillRect(0,0,p.width,p.height);
+  const t=Date.now()/150;
+  for(let i=0;i<10;i++){
+    const x=(i*32 + Math.floor(t*4))%p.width;
+    const y=20 + (i%3)*40;
+    pc.fillStyle = ['#FFD27F','#D0702A','#74C2FF','#9BFF8A'][i%4];
+    pc.fillRect(x,y,28,28);
+    pc.fillStyle='#081018';
+    pc.fillRect(x+4,y+4,20,20);
+  }
+  requestAnimationFrame(previewLoop);
+}
+previewLoop();
+</script>
+</body>
+</html>
