@@ -8,61 +8,30 @@
 <link rel="website icon" type="png" href="img/TETR.png">
 <style>
 html, body {
-  overflow: hidden;
-  height: 100%;
-  touch-action: none;
-  -webkit-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  margin:0;
+  overflow: hidden; height: 100%; touch-action: none; user-select: none; margin:0;
   font-family:'Press Start 2P', monospace;
-  background: linear-gradient(180deg,#081018,#07101a);
-  color: #EAE6DA;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:12px;
+  background: linear-gradient(180deg,#081018,#07101a); color: #EAE6DA;
+  display:flex; align-items:center; justify-content:center; padding:12px;
 }
-
 :root{--accent:#FFD27F;--muted:#9AA6B2;--text:#EAE6DA;}
-
-.frame{
-  width:min(760px,96vw);
-  background:linear-gradient(180deg,#081827,#041018);
-  border:4px solid #000;
-  padding:12px;
-  border-radius:6px;
-  display:flex;
-  gap:12px;
-  align-items:flex-start;
-  flex-direction:column;
-}
-
+.frame{width:min(760px,96vw); background:linear-gradient(180deg,#081827,#041018);
+border:4px solid #000; padding:12px; border-radius:6px; display:flex; gap:12px;
+align-items:flex-start; flex-direction:column;}
 .left, .right{width:100%; display:flex; flex-direction:column; align-items:center; gap:12px;}
-
 .canvas{background:#081018; padding:8px; border:3px solid #000; border-radius:6px;}
 canvas{background:#07101a; image-rendering:pixelated; display:block; width:100%; height:auto;}
-
 .controls{display:flex;gap:8px; flex-wrap:wrap; justify-content:center;}
-.btn{
-  padding:8px 10px; background:#111; border:3px solid #000;
-  color:var(--text); cursor:pointer; border-radius:6px; font-size:11px;
-}
+.btn{padding:8px 10px; background:#111; border:3px solid #000; color:var(--text); cursor:pointer;
+border-radius:6px; font-size:11px;}
 .btn:hover{background:var(--accent); color:#000;}
-
 .hud{font-size:12px;color:var(--text);}
 .scan{position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,0,0,0.03) 50%, transparent 51%);background-size:100% 4px;opacity:.35;}
-.footer { position: fixed; bottom: 15px; color: var(--muted); font-size: 8px;align-items: center; }
-.credits { position: fixed; bottom: 3px; color: var(--muted); font-size: 8px;align-items: center; }
-
-/* Mobile buttons */
+.footer { position: fixed; bottom: 15px; color: var(--muted); font-size: 8px; }
+.credits { position: fixed; bottom: 3px; color: var(--muted); font-size: 8px; }
 .touch-controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px;}
 .touch-btn{padding:10px;background:#111;color:var(--text);border:3px solid #000;border-radius:6px;font-size:12px;flex:1 1 30%;text-align:center;user-select:none;}
 .touch-btn:active{background:var(--accent);color:#000;}
-
-@media(max-width:760px){
-  .frame{flex-direction:column;}
-}
+@media(max-width:760px){.frame{flex-direction:column;}}
 </style>
 </head>
 <body>
@@ -79,7 +48,6 @@ canvas{background:#07101a; image-rendering:pixelated; display:block; width:100%;
     <div class="canvas">
       <canvas id="tetris" width="240" height="400"></canvas>
     </div>
-
     <div class="touch-controls">
       <div class="touch-btn" id="leftBtn">◀</div>
       <div class="touch-btn" id="rotateBtn">⟳</div>
@@ -87,22 +55,20 @@ canvas{background:#07101a; image-rendering:pixelated; display:block; width:100%;
       <div class="touch-btn" id="downBtn">▼</div>
     </div>
   </div>
-
   <div class="right">
     <div class="hud">Punteggio: <span id="gscore">0</span></div>
     <div style="font-size:11px;color:var(--muted);margin-top:10px">Controlli: frecce/WASD per ruotare. Su mobile usa i pulsanti touch.</div>
   </div>
 </div>
-
 <div class="scan"></div>
-<div class="footer">Versione Beta (1.0.0)</div>
+<div class="footer">Versione Beta (1.0.2)</div>
 <div class="credits">Fatto da Anto e ChatGPT</div>
 
 <script>
 const canvas = document.getElementById('tetris');
 const ctx = canvas.getContext('2d');
 const COLS = 12, ROWS = 20;
-const BLOCK = canvas.width / COLS; // dimensione blocco reale
+const BLOCK = canvas.width / COLS;
 let arena = createMatrix(COLS, ROWS);
 let player = { pos:{x:0,y:0}, matrix:null, score:0};
 let dropCounter = 0, dropInterval = 1000, lastTime = 0, difficulty = 1;
@@ -119,7 +85,15 @@ function createPiece(type){
   if(type==='S') return [[0,6,6],[6,6,0],[0,0,0]];
   if(type==='Z') return [[7,7,0],[0,7,7],[0,0,0]];
 }
-function randomPiece(){ const pieces='TJLOSZI'; return pieces[Math.floor(Math.random()*pieces.length)]; }
+function randomPiece(){
+  // più semplice: meno pezzi complessi per difficoltà bassa
+  const easyPieces = 'OILT'; 
+  const allPieces = 'TJLOSZI';
+  if(difficulty===1) return easyPieces[Math.floor(Math.random()*easyPieces.length)];
+  if(difficulty===2) return allPieces[Math.floor(Math.random()*allPieces.length)];
+  if(difficulty===3) return allPieces[Math.floor(Math.random()*allPieces.length)];
+  if(difficulty===4) return allPieces[Math.floor(Math.random()*allPieces.length)];
+}
 
 function collide(arena,player){
   const [m,o] = [player.matrix, player.pos];
@@ -141,7 +115,6 @@ function arenaSweep(){
       player.score += rowCount * 10;
       rowCount *=2;
       y++;
-      draw();
       document.getElementById('gscore').textContent = player.score;
     }
   }
@@ -212,13 +185,13 @@ function update(time=0){
   const delta = time - lastTime;
   lastTime = time;
   dropCounter += delta;
-  const effective = dropInterval / difficulty;
-  if(dropCounter > effective) playerDrop();
+  const speed = [1,1.5,2,3][difficulty-1];
+  if(dropCounter > dropInterval / speed) playerDrop();
   draw();
   requestAnimationFrame(update);
 }
 
-/* Keyboard controls */
+/* Keyboard */
 document.addEventListener('keydown',e=>{
   if(e.key==='ArrowLeft') playerMove(-1);
   if(e.key==='ArrowRight') playerMove(1);
@@ -227,22 +200,24 @@ document.addEventListener('keydown',e=>{
   if(e.key==='q') playerRotate(-1);
 });
 
-/* Touch buttons */
+/* Touch */
 document.getElementById('leftBtn').addEventListener('touchstart',()=>playerMove(-1));
 document.getElementById('rightBtn').addEventListener('touchstart',()=>playerMove(1));
 document.getElementById('downBtn').addEventListener('touchstart',()=>playerDrop());
 document.getElementById('rotateBtn').addEventListener('touchstart',()=>playerRotate(1));
 
-/* UI Buttons */
+/* Buttons */
 document.getElementById('btnRestart').addEventListener('click',()=>{
   arena = createMatrix(COLS,ROWS);
   player.score = 0;
   playerReset();
 });
+
+// Mini-menù difficoltà
 document.getElementById('btnDifficulty').addEventListener('click',()=>{
-  const d = prompt('Scegli difficoltà: 1=Easy 2=Medium 3=Hard 4=Extreme', difficulty);
-  const v = parseInt(d);
-  if(v>=1 && v<=4) difficulty = v;
+  const choice = prompt('Scegli difficoltà:\n1=Easy\n2=Medium\n3=Hard\n4=Extreme', difficulty);
+  const v = parseInt(choice);
+  if(v>=1 && v<=4) difficulty=v;
 });
 
 /* init */

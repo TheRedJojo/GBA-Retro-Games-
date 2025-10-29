@@ -107,6 +107,12 @@ html, body {
 .footer { position: fixed; bottom: 25px; color: var(--muted); font-size: 11px;align-items: center; }
 .credits { position: fixed; bottom: 4px; color: var(--muted); font-size: 11px;align-items: center; }
 
+.mode-select {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
 @media(max-width:400px){
   .frame { max-width: 100%; padding: 12px; }
   .btn { font-size: 9px; padding: 6px 8px; }
@@ -125,18 +131,23 @@ html, body {
     </div>
   </div>
 
-  <div id="board" class="board"></div>
+  <div id="modeSelect" class="mode-select">
+    <div class="btn" id="btnLocal">1v1 Locale</div>
+    <div class="btn" id="btnAI">VS AI</div>
+  </div>
+
+  <div id="board" class="board" style="display:none;"></div>
 
   <div class="hud">
     <div>Round score</div>
     <div>O: <span id="scoreO">0</span></div>
     <div>X: <span id="scoreX">0</span></div>
-    <div style="margin-top:8px;color:#FFD27F" id="status">Turno: O</div>
+    <div style="margin-top:8px;color:#FFD27F" id="status">Scegli modalità</div>
   </div>
 </div>
 
 <div class="scan"></div>
-<div class="footer">Versione Beta (1.0.0)</div>
+<div class="footer">Versione Beta (1.0.1)</div>
 <div class="credits">Fatto da Anto e ChatGPT</div>
 
 <script>
@@ -145,6 +156,7 @@ let grid = Array(9).fill('');
 let turn = 'O';
 let active = true;
 let scoreO = 0, scoreX = 0;
+let vsAI = false;
 
 const scoreOEl = document.getElementById('scoreO');
 const scoreXEl = document.getElementById('scoreX');
@@ -176,19 +188,73 @@ function cellClick(i) {
     return;
   }
 
-  // controllo pareggio
   if(!grid.includes('')) {
     active = false;
     statusEl.textContent = 'Pareggio';
-    // resetta il round senza incrementare i punteggi
     setTimeout(resetRound, 900);
     return;
   }
 
   turn = (turn === 'O') ? 'X' : 'O';
   statusEl.textContent = 'Turno: ' + turn;
+
+  if(vsAI && turn === 'X' && active) {
+    setTimeout(aiMove, 500);
+  }
 }
 
+function aiMove() {
+  if(!active) return;
+
+  // livello casuale di "intelligenza"
+  const smart = Math.random() > 0.4; // 60% di mosse intelligenti
+
+  let move = null;
+  if(smart) {
+    // Prova a vincere o bloccare
+    move = findBestMove('X') || findBestMove('O');
+  }
+  // se non trova nulla o gioca "male"
+  if(move === null) {
+    const empty = grid.map((v, i) => v === '' ? i : null).filter(v => v !== null);
+    move = empty[Math.floor(Math.random() * empty.length)];
+  }
+
+  grid[move] = 'X';
+  renderBoard();
+
+  const w = checkWinner();
+  if(w) {
+    active = false;
+    setTimeout(() => endRound(w), 300);
+    return;
+  }
+
+  if(!grid.includes('')) {
+    active = false;
+    statusEl.textContent = 'Pareggio';
+    setTimeout(resetRound, 900);
+    return;
+  }
+
+  turn = 'O';
+  statusEl.textContent = 'Turno: O';
+}
+
+function findBestMove(player) {
+  const lines = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  for(let [a,b,c] of lines) {
+    const line = [grid[a], grid[b], grid[c]];
+    if(line.filter(v => v === player).length === 2 && line.includes('')) {
+      return [a,b,c][line.indexOf('')];
+    }
+  }
+  return null;
+}
 
 function checkWinner() {
   const lines = [
@@ -229,9 +295,22 @@ function resetRound() {
   active = true;
   statusEl.textContent = 'Turno: O';
   renderBoard();
+  if(vsAI && turn === 'X') setTimeout(aiMove, 500);
 }
 
 document.getElementById('btnResetRound').addEventListener('click', resetRound);
+
+// Selezione modalità
+document.getElementById('btnLocal').addEventListener('click', () => startMode(false));
+document.getElementById('btnAI').addEventListener('click', () => startMode(true));
+
+function startMode(ai) {
+  vsAI = ai;
+  document.getElementById('modeSelect').style.display = 'none';
+  boardEl.style.display = 'grid';
+  resetRound();
+  statusEl.textContent = ai ? 'Turno: O (VS AI)' : 'Turno: O';
+}
 
 renderBoard();
 </script>
