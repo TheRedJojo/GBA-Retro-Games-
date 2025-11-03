@@ -13,7 +13,9 @@
     --accent:#FFD27F;
     --muted:#9AA6B2;
     --text:#EAE6DA;
+    --glow:#b300ff;
   }
+
   html, body {
     margin:0; padding:0;
     height:100%; width:100%;
@@ -34,6 +36,7 @@
     padding:8px;
     display:flex; flex-direction:column; align-items:center;
     gap:8px;
+    position:relative;
   }
 
   .logo{
@@ -42,13 +45,21 @@
     text-align:center;
   }
 
+  /* Campo di gioco con contorno viola fluo */
   .canvasWrap{
     width:100%;
     position:relative;
-    border:2px solid #000;
-    border-radius:4px;
+    border:3px solid var(--glow);
+    border-radius:6px;
     padding:4px;
     background:#07101a;
+    box-shadow:0 0 10px var(--glow), 0 0 20px var(--glow), inset 0 0 10px var(--glow);
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%,100% { box-shadow:0 0 8px var(--glow), 0 0 16px var(--glow), inset 0 0 8px var(--glow); }
+    50% { box-shadow:0 0 14px var(--glow), 0 0 28px var(--glow), inset 0 0 12px var(--glow); }
   }
 
   canvas{
@@ -145,12 +156,56 @@
     background-size:100% 4px;
     opacity:0.35;
   }
+
+/* --- PLAYER NAME + BEST SCORES (fissi in alto a destra) --- */
+.topRightBox {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 999; /* sempre sopra al resto */
+}
+
+/* Nome giocatore */
+.playerName {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Pulsante BEST SCORES */
+.bestBtn {
+  padding: 6px 8px;
+  background: #111;
+  border: 2px solid #000;
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  
+}
+.bestBtn:hover {
+  background: var(--accent);
+  color: #000;
+  transform: translateY(-1px);
+}
+
+
+
 </style>
 </head>
 <body>
 
 <div class="wrapper">
   <div class="logo">GBA — PixelSnake</div>
+
+  <!-- BEST SCORES and player name -->
+  <button class="bestBtn" id="bestBtn" onclick="location.href='bestscores.html'">BEST SCORES</button>
+  <div class="playerName" id="playerName">Player: —</div>
 
   <div class="canvasWrap">
     <canvas id="game" width="270" height="270"></canvas>
@@ -186,6 +241,31 @@
 <div class="credits">Fatto da Anto e ChatGPT</div>
 
 <script>
+/* ---------- Nick & scores utility ---------- */
+function getNick(){ return localStorage.getItem('gba_snake_nick') || null; }
+function getPersonalHS(){ return parseInt(localStorage.getItem('gba_snake_hs')||'0',10); }
+function setPersonalHS(v){ localStorage.setItem('gba_snake_hs', String(v)); }
+
+/* scores array stored as JSON array of {nick,score} */
+function readScores(){ try{ return JSON.parse(localStorage.getItem('gba_snake_scores')||'[]') }catch(e){ return []; } }
+function writeScores(arr){ localStorage.setItem('gba_snake_scores', JSON.stringify(arr)); }
+
+/* update global local leaderboard for a given nick with best score */
+function updateGlobalScores(nick, score){
+  if(!nick) return;
+  const arr = readScores();
+  const idx = arr.findIndex(x=>x.nick===nick);
+  if(idx>=0){
+    if(score > arr[idx].score) arr[idx].score = score;
+  } else {
+    arr.push({nick: nick, score: score});
+  }
+  // sort desc by score
+  arr.sort((a,b)=>b.score - a.score || a.nick.localeCompare(b.nick));
+  writeScores(arr);
+}
+
+/* ---------- Game code (unchanged logic) ---------- */
 const canvas=document.getElementById('game'), ctx=canvas.getContext('2d');
 const GRID=15;
 let snake=[], dir={x:0,y:0}, food={x:0,y:0}, score=0, hs=parseInt(localStorage.getItem('gba_snake_hs')||0);
@@ -193,6 +273,11 @@ let running=false, over=false, tick=130, timer=null, bonusFood=null;
 
 const scoreEl=document.getElementById('score'), hsEl=document.getElementById('hs'), msg=document.getElementById('message');
 hsEl.textContent=hs;
+
+// display player name
+const playerNameEl = document.getElementById('playerName');
+const nick = getNick();
+playerNameEl.textContent = nick ? ('Player: '+nick) : 'Player: (anon)';
 
 function randPos(){return{x:Math.floor(Math.random()*(canvas.width/GRID)),y:Math.floor(Math.random()*(canvas.height/GRID))};}
 function placeFood(){food=randPos();if(Math.random()<0.2)bonusFood=randPos();else bonusFood=null;}
@@ -244,6 +329,20 @@ function render(){
 function endGame(){
   over=true;running=false;clearInterval(timer);
   msg.textContent='Hai perso — punteggio: '+score;
+
+  // aggiorna record personale e la classifica locale (solo se nick presente)
+  const curNick = getNick();
+  if(score > hs){
+    hs = score;
+    setPersonalHS(hs);
+    msg.textContent = 'Nuovo record: '+hs;
+  }
+  // salviamo la classifica globale locale SOLO se l'utente ha scelto un nickname
+  if(curNick){
+    updateGlobalScores(curNick, hs);
+  }
+
+  // dopo 1400ms riavvia
   setTimeout(()=>reset(true),1400);
 }
 
@@ -255,7 +354,7 @@ function loop(){
   snake.unshift(head);
   if(head.x===food.x&&head.y===food.y){
     score++;
-    if(score>hs){hs=score;localStorage.setItem('gba_snake_hs',hs);msg.textContent='Nuovo record: '+hs;}
+    if(score>hs){hs=score;setPersonalHS(hs);msg.textContent='Nuovo record: '+hs;}
     placeFood();
   }else if(bonusFood && head.x===bonusFood.x && head.y===bonusFood.y){
     score+=2; bonusFood=null; msg.textContent='🍏 Mela dorata!';
