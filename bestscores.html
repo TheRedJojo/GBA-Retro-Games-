@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<title>Best Scores - PixelSnake</title>
+<title>Best Scores - GBA</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <link rel="website icon" type="png" href="img/SNAKE.png">
 <style>
@@ -17,8 +17,9 @@
   --bronze:#CD7F32;
 }
 html,body{margin:0;padding:0;height:100%;font-family:'Press Start 2P',monospace;background:linear-gradient(180deg,var(--bg),#07101a);color:var(--text);display:flex;align-items:center;justify-content:center;}
+.container{ width:94vw; max-width:1100px; display:flex; gap:18px; justify-content:center; align-items:flex-start; flex-wrap:wrap; padding:12px;}
 .card{
-  width:92vw; max-width:420px;
+  width:48%; min-width:300px;
   background:linear-gradient(180deg,#0f1724,#07101a);
   border:4px solid #000;
   padding:16px;
@@ -27,7 +28,7 @@ html,body{margin:0;padding:0;height:100%;font-family:'Press Start 2P',monospace;
   box-shadow:0 6px 0 #000;
   position:relative;
 }
-h1{color:var(--accent);font-size:14px;margin:0 0 12px 0;}
+h1{color:var(--accent);font-size:13px;margin:0 0 12px 0;}
 .list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 .item{
   display:flex;align-items:center;justify-content:space-between;
@@ -37,92 +38,112 @@ h1{color:var(--accent);font-size:14px;margin:0 0 12px 0;}
 .rank{font-size:12px; width:40px; text-align:left;}
 .nick{flex:1;text-align:left;padding-left:8px;}
 .score{width:60px;text-align:right;}
-.note{margin-top:10px;color:var(--muted);font-size:10px;}
-.backBtn{
-  align-items: bottom;
-  padding:6px 8px;border:2px solid #000;background:#111;color:var(--text);border-radius:6px;cursor:pointer;font-size:10px;font-family: 'Press Start 2P', monospace;
-}
 .empty{color:var(--muted);font-size:11px;padding:12px;border:3px dashed #000;border-radius:6px;background:rgba(255,255,255,0.01);}
 .posLine{margin-top:12px;font-size:11px;color:var(--muted);}
+.back{position:fixed; bottom:12px; left:12px; padding:8px 10px; background:#111; border:3px solid #000; border-radius:6px; color:var(--text); cursor:pointer; font-size:11px;}
+.back:hover{ background:var(--accent); color:#000;}
+.note{margin-top:8px;color:var(--muted);font-size:10px;}
 </style>
 </head>
 <body>
-  <div class="card">
-    <button class="backBtn" onclick="location.href='snake.html'">INDIETRO</button>
-    <h1>BEST SCORES — PIXEL SNAKE</h1>
+  <div class="container">
+    <div class="card" id="snakeCard">
+      <h1>PIXEL SNAKE — TOP</h1>
+      <div id="snakeList" class="list"></div>
+      <div id="snakePos" class="posLine"></div>
+      <div class="note">Aggiornamento in tempo reale (Firebase) o locale (localStorage) se non configurato.</div>
+    </div>
 
-    <div id="topList" class="list"></div>
-
-    <div id="posArea" class="posLine"></div>
-
-    <div class="note">Solo i giocatori che hanno inserito un nickname (nella schermata principale) appaiono qui. I migliori 3 sono evidenziati.</div>
+    <div class="card" id="birdCard">
+      <h1>JUMPIN BIRDIE — TOP</h1>
+      <div id="birdList" class="list"></div>
+      <div id="birdPos" class="posLine"></div>
+      <div class="note">Solo giocatori con nickname appaiono qui.</div>
+    </div>
   </div>
 
+  <div class="back" onclick="location.href='index.html'">INDIETRO</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <script>
-function readScores(){ try{ return JSON.parse(localStorage.getItem('gba_snake_scores')||'[]') }catch(e){ return []; } }
-function getNick(){ return localStorage.getItem('gba_snake_nick') || null; }
+/* ---------- CONFIG - metti qui la stessa config Realtime DB usata in jumpinbirdie.html ---------- */
+alert("PAGINA IN MANUTENZIONE! TORNA INDIETRO!")
 
-const topList = document.getElementById('topList');
-const posArea = document.getElementById('posArea');
-
-function render(){
-  const arr = readScores();
-  if(!arr.length){
-    topList.innerHTML = '<div class="empty">Nessun punteggio registrato — gioca e inserisci il tuo nickname per comparire qui.</div>';
-    posArea.textContent = '';
-    return;
-  }
-  // top 3
-  const top3 = arr.slice(0,3);
-  topList.innerHTML = '';
-  top3.forEach((entry, idx)=>{
-    const el = document.createElement('div');
-    el.className = 'item';
-    const medalColor = idx===0? '--gold' : (idx===1? '--silver' : '--bronze');
-    const rankSpan = document.createElement('div');
-    rankSpan.className='rank';
-    rankSpan.textContent = (idx+1)+'.';
-    // style medal
-    const nickDiv = document.createElement('div');
-    nickDiv.className='nick';
-    nickDiv.textContent = entry.nick;
-    const scoreDiv = document.createElement('div');
-    scoreDiv.className='score';
-    scoreDiv.textContent = entry.score;
-    el.appendChild(rankSpan);
-    el.appendChild(nickDiv);
-    el.appendChild(scoreDiv);
-    // color accents
-    if(idx===0) { el.style.borderColor = '#000'; el.style.background = 'linear-gradient(90deg, rgba(255,215,0,0.06), rgba(0,0,0,0.04))'; }
-    if(idx===1) { el.style.background = 'linear-gradient(90deg, rgba(192,192,192,0.04), rgba(0,0,0,0.04))'; }
-    if(idx===2) { el.style.background = 'linear-gradient(90deg, rgba(205,127,50,0.04), rgba(0,0,0,0.04))'; }
-    topList.appendChild(el);
-  });
-
-  // if more than 3, show compact list of positions 4..N (but we need only player's position)
-  const nick = getNick();
-  if(!nick){
-    posArea.textContent = 'Se non hai inserito un nickname, la tua posizione non può essere mostrata.';
-    return;
-  }
-
-  const idx = arr.findIndex(x=>x.nick === nick);
-  if(idx === -1){
-    posArea.textContent = 'Sei: non presente nella classifica per ora. Gioca per entrare nella Top!';
-    return;
-  }
-
-  if(idx < 3){
-    posArea.textContent = `Sei: posizione ${idx+1} — ${arr[idx].score} punti (TU)`;
-    return;
-  }
-
-  // costruisci "1...2...3...N(TU)" stringa con puntini
-  const s = `1...2...3...${idx+1} (TU) — ${arr[idx].score} pts`;
-  posArea.textContent = s;
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  databaseURL: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+const firebaseEnabled = Boolean(firebaseConfig.apiKey && firebaseConfig.databaseURL);
+if(firebaseEnabled){
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.database();
 }
 
-render();
+/* ---------- util ---------- */
+const nick = localStorage.getItem('gba_snake_nick') || null;
+function readLocal(key){ try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; } }
+
+const snakeListEl = document.getElementById('snakeList'), snakePosEl = document.getElementById('snakePos');
+const birdListEl = document.getElementById('birdList'), birdPosEl = document.getElementById('birdPos');
+
+function renderBoard(arr, listEl, posEl, gameLabel){
+  if(!arr || !arr.length){
+    listEl.innerHTML = '<div class="empty">Nessun punteggio registrato.</div>'; posEl.textContent=''; return;
+  }
+  arr.sort((a,b)=>b.score - a.score);
+  listEl.innerHTML = '';
+  arr.slice(0,3).forEach((e,i)=>{
+    const div=document.createElement('div'); div.className='item';
+    div.innerHTML = `<div class="rank">${i+1}.</div><div class="nick">${e.name}</div><div class="score">${e.score}</div>`;
+    if(i===0) div.style.background='linear-gradient(90deg, rgba(255,215,0,0.06), rgba(0,0,0,0.04))';
+    if(i===1) div.style.background='linear-gradient(90deg, rgba(192,192,192,0.04), rgba(0,0,0,0.04))';
+    if(i===2) div.style.background='linear-gradient(90deg, rgba(205,127,50,0.04), rgba(0,0,0,0.04))';
+    listEl.appendChild(div);
+  });
+  if(!nick){ posEl.textContent = 'Nickname non inserito.'; return; }
+  const idx = arr.findIndex(x=>x.name === nick);
+  if(idx === -1){ posEl.textContent = 'Non sei ancora in classifica.'; return; }
+  posEl.textContent = `Posizione ${idx+1} — ${arr[idx].score} pts`;
+}
+
+/* ---------- Data sources ---------- */
+if(firebaseEnabled){
+  const sRef = db.ref('leaderboards/snake');
+  const bRef = db.ref('leaderboards/jumpinbirdie');
+
+  sRef.on('value', snap=>{
+    const obj = snap.val() || {};
+    const arr = Object.keys(obj).map(k=>({ name: obj[k].name, score: obj[k].score }));
+    arr.sort((a,b)=>b.score - a.score);
+    try{ localStorage.setItem('snakeLeaderboard', JSON.stringify(arr)); }catch(e){}
+    renderBoard(arr, snakeListEl, snakePosEl, 'snake');
+  });
+
+  bRef.on('value', snap=>{
+    const obj = snap.val() || {};
+    const arr = Object.keys(obj).map(k=>({ name: obj[k].name, score: obj[k].score }));
+    arr.sort((a,b)=>b.score - a.score);
+    try{ localStorage.setItem('jumpinLeaderboard', JSON.stringify(arr)); }catch(e){}
+    renderBoard(arr, birdListEl, birdPosEl, 'jumpinbirdie');
+  });
+} else {
+  // fallback polling localStorage (near realtime)
+  function refreshLocal(){
+    const s = readLocal('snakeLeaderboard');
+    const b = readLocal('jumpinLeaderboard');
+    renderBoard(s, snakeListEl, snakePosEl, 'snake');
+    renderBoard(b, birdListEl, birdPosEl, 'jumpinbirdie');
+  }
+  refreshLocal();
+  setInterval(refreshLocal, 1000);
+}
 </script>
 </body>
 </html>

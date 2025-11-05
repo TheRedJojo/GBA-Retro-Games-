@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<title>Jumpin Birdie - GBA (NES)</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link rel="website icon" type="png" href="img/SNAKE.png">
+<style>
+:root{
+  --bg:#081018;
+  --panel:#0f1724;
+  --accent:#FFD27F;
+  --muted:#9AA6B2;
+  --text:#EAE6DA;
+  --glow:#b300ff;
+  --danger:#ff3b3b;
+}
+html, body {
+  margin:0; padding:0;
+  height:100%; width:100%;
+  overflow:hidden;
+  font-family:'Press Start 2P',monospace;
+  background:linear-gradient(180deg,var(--bg),#07101a);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  touch-action:none; -webkit-user-select:none; user-select:none;
+}
+*{box-sizing:border-box}
+
+/* Wrapper (identical look to Snake) */
+.wrapper{
+  width:90vw;
+  max-width:420px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+  border:3px solid #000;
+  border-radius:6px;
+  padding:8px;
+  display:flex; flex-direction:column; align-items:center;
+  gap:8px;
+  position:relative;
+}
+.logo{ color:var(--accent); font-size:10px; text-align:center; }
+
+/* Canvas wrap identical style */
+.canvasWrap{
+  width:100%;
+  position:relative;
+  border:3px solid var(--glow);
+  border-radius:6px;
+  padding:4px;
+  background:#07101a;
+  box-shadow:0 0 10px var(--glow), 0 0 20px var(--glow), inset 0 0 10px var(--glow);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+@keyframes glowPulse {
+  0%,100% { box-shadow:0 0 8px var(--glow), 0 0 16px var(--glow), inset 0 0 8px var(--glow); }
+  50% { box-shadow:0 0 14px var(--glow), 0 0 28px var(--glow), inset 0 0 12px var(--glow); }
+}
+canvas{ width:100%; height:auto; display:block; background:#6fb7ff; border:1px solid #000; image-rendering:pixelated; }
+
+/* hud/buttons same as Snake */
+.hud{ width:100%; color:var(--text); font-size:10px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+#message{ color:var(--accent); min-height:16px; text-align:center; font-size:9px; }
+.controls{ display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin-top:4px; }
+.btn{ flex:1 1 45%; padding:8px 6px; background:#111; border:2px solid #000; color:var(--text); text-align:center; border-radius:4px; cursor:pointer; font-size:9px; }
+.btn:hover{ background:var(--accent); color:#000; transform:translateY(-1px); }
+
+.topRightBox { position: fixed; top: 8px; right: 8px; display:flex; gap:8px; z-index:999; font-family:'Press Start 2P',monospace; }
+.playerName { font-size:9px; color:var(--muted); }
+.bestBtn { padding:6px 8px; background:#111; border:2px solid #000; color:var(--text); font-size:9px; border-radius:4px; cursor:pointer; }
+.bestBtn:hover{ background:var(--accent); color:#000; transform:translateY(-1px); }
+
+.footer,.credits{ font-size:8px; color:var(--muted); position:fixed; }
+.footer{ bottom: 12px; } .credits{ bottom: 2px; }
+.scan{ position:fixed; inset:0; pointer-events:none; background-image:linear-gradient(rgba(0,0,0,0.03) 50%, transparent 51%); background-size:100% 4px; opacity:0.35; }
+
+/* GAME OVER overlay (same font/feel) */
+.gameOverOverlay{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none;
+}
+.gameOverText{
+  display:none; color:var(--accent); font-size:14px; background:rgba(0,0,0,0.6); border:3px solid #000; padding:8px; border-radius:6px;
+}
+
+/* make sure mobile taps look ok */
+.touchHint{ font-size:9px; color:var(--muted); margin-top:4px; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+  <div class="logo">GBA — Jumpin Birdie</div>
+
+  <div class="topRightBox">
+    <div class="playerName" id="playerName">Player: —</div>
+    <button class="bestBtn" id="bestBtn">BEST SCORES</button>
+  </div>
+
+  <div class="canvasWrap">
+    <!-- Wider field (longer) but same height as snake: 420x270 scaled into wrapper width -->
+    <canvas id="game" width="420" height="270"></canvas>
+    <div class="gameOverOverlay"><div class="gameOverText" id="gameOverText">GAME OVER</div></div>
+  </div>
+
+  <div class="hud">
+    <div>Punteggio: <span id="score">0</span></div>
+    <div>Record: <span id="hs">0</span></div>
+    <div id="message"></div>
+  </div>
+
+  <div class="controls">
+    <div class="btn" id="btnRestart">RIAVVIA</div>
+    <div class="btn" id="btnMenu" onclick="location.href='index.html'">MENU</div>
+  </div>
+
+  <div class="touchHint">Clicca / Tocca ovunque per saltare</div>
+</div>
+
+<div class="scan"></div>
+<div class="footer">Versione Beta (1.0.1)</div>
+<div class="credits">Fatto da Anto e ChatGPT</div>
+
+<!-- Firebase Realtime (compat) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+/* ---------- CONFIG - inserisci la tua Realtime DB config qui ---------- */
+const firebaseConfig = {
+  apiKey: "",             // <-- METTI QUI I TUOI VALORI
+  authDomain: "",
+  databaseURL: "",        // es: "https://project-id-default-rtdb.firebaseio.com"
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
+/* Se lasci vuoto, uso solo localStorage come fallback. */
+const firebaseEnabled = Boolean(firebaseConfig.apiKey && firebaseConfig.databaseURL);
+if(firebaseEnabled){
+  firebase.initializeApp(firebaseConfig);
+  var db = firebase.database();
+}
+
+/* ---------- Keys / util ---------- */
+const NICK_KEY = 'gba_snake_nick'; // shared with index/snake
+const LOCAL_KEY = 'jumpinLeaderboard'; // mirror for bestscores
+const REMOTE_PATH = 'leaderboards/jumpinbirdie'; // Realtime path
+
+function getNick(){ return localStorage.getItem(NICK_KEY) || null; }
+
+/* ---------- Canvas / Game ---------- */
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const scoreEl = document.getElementById('score'), hsEl = document.getElementById('hs'), msg = document.getElementById('message');
+const playerNameEl = document.getElementById('playerName');
+const btnRestart = document.getElementById('btnRestart'), bestBtn = document.getElementById('bestBtn');
+const goText = document.getElementById('gameOverText');
+
+let W = canvas.width, H = canvas.height;
+let nick = getNick();
+playerNameEl.textContent = nick ? ('Player: ' + nick) : 'Player: (anon)';
+
+let bird = { x:90, y: H/2, vy:0, r:10, color:'#FFD27F' };
+let gravity = 0.26, jump = -5.8; // easier: gentler gravity, stronger jump
+let pipes = [], pipeW = 44, gap = 84, frame = 0, speed = 2.0;
+let score = 0, hs = parseInt(localStorage.getItem('gba_jumpin_hs') || '0', 10);
+hsEl.textContent = hs;
+scoreEl.textContent = score;
+
+let clouds = [];
+for(let i=0;i<6;i++) clouds.push({x: Math.random()*W, y: 12 + Math.random()*40, s: 0.15 + Math.random()*0.6});
+
+/* draw sky (pixel clouds) */
+function drawSky(){
+  const g = ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#86c7ff');
+  g.addColorStop(1,'#6fb7ff');
+  ctx.fillStyle = g;
+  ctx.fillRect(0,0,W,H);
+  clouds.forEach(c=>{
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fillRect(Math.floor(c.x), Math.floor(c.y), 10,5);
+    ctx.fillRect(Math.floor(c.x+8), Math.floor(c.y-2), 8,4);
+    ctx.fillRect(Math.floor(c.x+16), Math.floor(c.y+1), 8,4);
+  });
+  clouds.forEach(c=>{ c.x -= 0.25 + c.s*0.15; if(c.x < -40) c.x = W + Math.random()*80; });
+}
+
+/* draw nicer pixel bird (square body + little wing + eyes) */
+function drawBird(dead=false){
+  // body
+  ctx.fillStyle = bird.color;
+  ctx.fillRect(Math.floor(bird.x - bird.r), Math.floor(bird.y - bird.r), bird.r*2, bird.r*2);
+  // wing (pixel)
+  ctx.fillStyle = '#e6c47a';
+  ctx.fillRect(Math.floor(bird.x - 2), Math.floor(bird.y - 2), 6, 3);
+  // eyes
+  if(!dead){
+    ctx.fillStyle = '#003300';
+    ctx.fillRect(Math.floor(bird.x - 5), Math.floor(bird.y - 6), 2,2);
+    ctx.fillRect(Math.floor(bird.x + 3), Math.floor(bird.y - 6), 2,2);
+  } else {
+    ctx.fillStyle = '#ff4444';
+    ctx.font = '10px monospace';
+    ctx.fillText('X', Math.floor(bird.x - 6), Math.floor(bird.y - 2));
+    ctx.fillText('X', Math.floor(bird.x + 2), Math.floor(bird.y - 2));
+  }
+}
+
+/* pipes */
+function drawPipes(){
+  ctx.fillStyle = '#2c8a4b';
+  pipes.forEach(p=>{
+    ctx.fillRect(Math.floor(p.x), 0, pipeW, Math.floor(p.top));
+    ctx.fillRect(Math.floor(p.x), Math.floor(p.top + gap), pipeW, Math.floor(H - p.top - gap));
+    // decorative black border lines
+    ctx.strokeStyle = '#072';
+    ctx.strokeRect(Math.floor(p.x)+1, 1, pipeW-2, Math.floor(p.top)-2);
+  });
+}
+
+/* render frame */
+function render(){
+  drawSky();
+  drawPipes();
+  drawBird(gameOverState);
+  // HUD small panel (score)
+  ctx.fillStyle = '#081018';
+  ctx.fillRect(0,0,90,24);
+  ctx.fillStyle = '#fff';
+  ctx.font = '11px monospace';
+  ctx.fillText('SCORE: ' + score, 8, 16);
+}
+
+/* game loop */
+let loopId = null;
+let gameOverState = false;
+
+function reset(start=false){
+  bird = { x:90, y: H/2, vy:0, r:10, color: bird.color || '#FFD27F' };
+  pipes = [];
+  frame = 0;
+  score = 0;
+  gameOverState = false;
+  goText.style.display = 'none';
+  scoreEl.textContent = score;
+  hsEl.textContent = hs;
+  if(loopId) cancelAnimationFrame(loopId);
+  loop();
+}
+
+/* spawn */
+function spawnPipe(){
+  const padding = 36;
+  const top = padding + Math.random()*(H - padding*2 - gap);
+  pipes.push({ x: W, top: Math.floor(top), passed:false });
+}
+
+/* loop */
+function loop(){
+  if(!gameOverState){
+    frame++;
+    bird.vy += gravity;
+    bird.y += bird.vy;
+    if(frame % 85 === 0) spawnPipe();
+    for(let i=0;i<pipes.length;i++) pipes[i].x -= speed;
+    pipes = pipes.filter(p => p.x + pipeW > -20);
+    // collision & scoring
+    pipes.forEach(p=>{
+      if(!p.passed && p.x + pipeW < bird.x - bird.r + 6){
+        p.passed = true;
+        score++;
+        scoreEl.textContent = score;
+        // update immediate HS visual & localStorage
+        if(score > hs){ hs = score; hsEl.textContent = hs; localStorage.setItem('gba_jumpin_hs', String(hs)); msg.textContent = 'Nuovo record: '+hs; }
+      }
+      if(bird.x + bird.r > p.x && bird.x - bird.r < p.x + pipeW){
+        if(bird.y - bird.r < p.top || bird.y + bird.r > p.top + gap){
+          die();
+        }
+      }
+    });
+    if(bird.y - bird.r <= 0 || bird.y + bird.r >= H) die();
+  }
+  render();
+  loopId = requestAnimationFrame(loop);
+}
+
+/* die */
+function die(){
+  if(gameOverState) return;
+  gameOverState = true;
+  goText.style.display = 'block';
+  // set X eyes by rendering with dead=true (render loop uses gameOverState)
+  // local HS persist
+  let prev = parseInt(localStorage.getItem('gba_jumpin_hs')||'0',10);
+  if(score > prev) localStorage.setItem('gba_jumpin_hs', String(score));
+  // update local leaderboard mirror
+  updateLocalBoard(nick, score);
+  // push to firebase Realtime if configured
+  if(firebaseEnabled && nick){
+    try{
+      const safeKey = encodeURIComponent(nick);
+      const ref = db.ref(REMOTE_PATH + '/' + safeKey);
+      ref.once('value').then(snapshot=>{
+        const val = snapshot.val();
+        if(!val || score > (val.score || 0)){
+          ref.set({ name: nick, score: score, game: 'jumpinbirdie' });
+        }
+      }).catch(()=>{/* ignore network errors */});
+      // also update the top-level list mirror for bestscores
+      // we mirror remote -> local in bestscores page via listener too
+    }catch(e){}
+  }
+  // keep Game Over shown 2 seconds then reset (as requested)
+  setTimeout(()=>{ reset(true); }, 2000);
+}
+
+/* local leaderboard update (mirror used by bestscores.html) */
+function updateLocalBoard(name, sc){
+  if(!name) return;
+  const key = LOCAL_KEY;
+  let arr = [];
+  try{ arr = JSON.parse(localStorage.getItem(key) || '[]'); }catch(e){ arr = []; }
+  const idx = arr.findIndex(x=>x.name === name);
+  if(idx >= 0){
+    if(sc > arr[idx].score) arr[idx].score = sc;
+  } else arr.push({ name: name, score: sc });
+  arr.sort((a,b)=>b.score - a.score);
+  try{ localStorage.setItem(key, JSON.stringify(arr)); localStorage.setItem('jumpinLeaderboard', JSON.stringify(arr)); }catch(e){}
+}
+
+/* input */
+canvas.addEventListener('click', ()=>{ if(!gameOverState){ bird.vy = jump; } else { /* if dead clicks ignored */ } });
+document.addEventListener('keydown', e=>{ if(e.key === ' ' || e.key === 'ArrowUp'){ e.preventDefault(); if(!gameOverState) bird.vy = jump; }});
+btnRestart.addEventListener('click', ()=> reset(true) );
+bestBtn.addEventListener('click', ()=> location.href = 'bestscores.html' );
+
+/* color selection BEFORE first start? keep same style: if user wants to choose skin,
+   they can change in localStorage 'gba_jumpin_color' manually or we could add later UI.
+   For now, if exists use it:
+*/
+const savedColor = localStorage.getItem('gba_jumpin_color');
+if(savedColor) bird.color = savedColor;
+
+/* mirror remote -> local if firebase enabled (so bestscores page picks up realtime) */
+if(firebaseEnabled){
+  const remoteRef = db.ref('leaderboards/jumpinbirdie');
+  remoteRef.on('value', snap=>{
+    const obj = snap.val() || {};
+    const arr = Object.keys(obj).map(k=>({ name: obj[k].name, score: obj[k].score }));
+    arr.sort((a,b)=>b.score - a.score);
+    try{ localStorage.setItem('jumpinLeaderboard', JSON.stringify(arr)); }catch(e){}
+  });
+  // also mirror for snake if exists
+  const remoteSnakeRef = db.ref('leaderboards/snake');
+  remoteSnakeRef.on('value', snap=>{
+    const obj = snap.val() || {};
+    const arr = Object.keys(obj).map(k=>({ name: obj[k].name, score: obj[k].score }));
+    arr.sort((a,b)=>b.score - a.score);
+    try{ localStorage.setItem('snakeLeaderboard', JSON.stringify(arr)); }catch(e){}
+  });
+}
+
+/* initial start */
+reset(true);
+
+/* expose updateScore for optional Firestore-style usage (but we use Realtime above) */
+async function updateScoreRemoteIfBetter(nickName, newScore){
+  if(!firebaseEnabled || !nickName) return;
+  const safeKey = encodeURIComponent(nickName);
+  const ref = db.ref(REMOTE_PATH + '/' + safeKey);
+  try{
+    const snap = await ref.once('value');
+    const val = snap.val();
+    if(!val || newScore > val.score) await ref.set({ name: nickName, score: newScore, game: 'jumpinbirdie' });
+  }catch(e){}
+}
+</script>
+</body>
+</html>

@@ -15,393 +15,164 @@
     --text:#EAE6DA;
     --glow:#b300ff;
   }
-
-  html, body {
-    margin:0; padding:0;
-    height:100%; width:100%;
-    overflow:hidden;
-    font-family:'Press Start 2P',monospace;
-    background: linear-gradient(180deg,var(--bg),#07101a);
-    display:flex; flex-direction:column; align-items:center; justify-content:center;
-    touch-action:none;
-    -webkit-user-select:none; user-select:none;
-  }
-
-  .wrapper{
-    width:90vw;
-    max-width:360px;
-    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
-    border:3px solid #000;
-    border-radius:6px;
-    padding:8px;
-    display:flex; flex-direction:column; align-items:center;
-    gap:8px;
-    position:relative;
-  }
-
-  .logo{
-    color:var(--accent);
-    font-size:10px;
-    text-align:center;
-  }
-
-  /* Campo di gioco con contorno viola fluo */
-  .canvasWrap{
-    width:100%;
-    position:relative;
-    border:3px solid var(--glow);
-    border-radius:6px;
-    padding:4px;
-    background:#07101a;
-    box-shadow:0 0 10px var(--glow), 0 0 20px var(--glow), inset 0 0 10px var(--glow);
-    animation: glowPulse 2s ease-in-out infinite;
-  }
-
-  @keyframes glowPulse {
-    0%,100% { box-shadow:0 0 8px var(--glow), 0 0 16px var(--glow), inset 0 0 8px var(--glow); }
-    50% { box-shadow:0 0 14px var(--glow), 0 0 28px var(--glow), inset 0 0 12px var(--glow); }
-  }
-
-  canvas{
-    width:100%; height:auto;
-    display:block;
-    background:#111;
-    border:1px solid #000;
-    image-rendering:pixelated;
-  }
-
-  .hud{
-    width:100%;
-    color:var(--text);
-    font-size:10px;
-    display:flex; flex-direction:column; align-items:center; gap:2px;
-  }
-
-  #message{
-    color:var(--accent);
-    min-height:16px;
-    text-align:center;
-    font-size:9px;
-  }
-
-  .controls{
-    display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin-top:4px;
-  }
-
-  .btn{
-    flex:1 1 45%;
-    padding:8px 6px;
-    background:#111;
-    border:2px solid #000;
-    color:var(--text);
-    text-align:center;
-    border-radius:4px;
-    cursor:pointer;
-    font-size:9px;
-  }
-
-  .btn:hover{
-    background:var(--accent);
-    color:#000;
-    transform:translateY(-1px);
-  }
-
-  .arrows{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin-top:6px;
-    gap:4px;
-  }
-
-  .arrow-row{
-    display:flex;
-    justify-content:center;
-    gap:4px;
-  }
-
-  .arrow{
-    width:32px; height:32px;
-    background:#111;
-    border:2px solid #000;
-    border-radius:4px;
-    color:var(--text);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:12px;
-    cursor:pointer;
-    user-select:none;
-  }
-
-  .arrow:active{
-    background:var(--accent);
-    color:#000;
-  }
-
-  .footer,.credits{
-    font-size:8px;
-    color:var(--muted);
-    position:fixed;
-  }
-
+  html, body { margin:0; padding:0; height:100%; width:100%; overflow:hidden; font-family:'Press Start 2P',monospace; background: linear-gradient(180deg,var(--bg),#07101a); display:flex; flex-direction:column; align-items:center; justify-content:center; touch-action:none; -webkit-user-select:none; user-select:none; }
+  .wrapper{ width:90vw; max-width:360px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06)); border:3px solid #000; border-radius:6px; padding:8px; display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; }
+  .logo{ color:var(--accent); font-size:10px; text-align:center; }
+  .canvasWrap{ width:100%; position:relative; border:3px solid var(--glow); border-radius:6px; padding:4px; background:#07101a; box-shadow:0 0 10px var(--glow), 0 0 20px var(--glow), inset 0 0 10px var(--glow); animation: glowPulse 2s ease-in-out infinite; }
+  @keyframes glowPulse { 0%,100% { box-shadow:0 0 8px var(--glow), 0 0 16px var(--glow), inset 0 0 8px var(--glow); } 50% { box-shadow:0 0 14px var(--glow), 0 0 28px var(--glow), inset 0 0 12px var(--glow); } }
+  canvas{ width:100%; height:auto; display:block; background:#111; border:1px solid #000; image-rendering:pixelated; }
+  .hud{ width:100%; color:var(--text); font-size:10px; display:flex; flex-direction:column; align-items:center; gap:2px; }
+  #message{ color:var(--accent); min-height:16px; text-align:center; font-size:9px; }
+  .controls{ display:flex; justify-content:center; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .btn{ flex:1 1 45%; padding:8px 6px; background:#111; border:2px solid #000; color:var(--text); text-align:center; border-radius:4px; cursor:pointer; font-size:9px; }
+  .btn:hover{ background:var(--accent); color:#000; transform:translateY(-1px); }
+  .arrows{ display:flex; flex-direction:column; align-items:center; margin-top:6px; gap:4px; }
+  .arrow-row{ display:flex; justify-content:center; gap:4px; }
+  .arrow{ width:32px; height:32px; background:#111; border:2px solid #000; border-radius:4px; color:var(--text); display:flex; align-items:center; justify-content:center; font-size:12px; cursor:pointer; user-select:none; }
+  .arrow:active{ background:var(--accent); color:#000; }
+  .footer,.credits{ font-size:8px; color:var(--muted); position:fixed; }
   .footer { bottom: 12px; }
   .credits { bottom: 2px; }
-
-  .scan{
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    background-image:linear-gradient(rgba(0,0,0,0.03) 50%, transparent 51%);
-    background-size:100% 4px;
-    opacity:0.35;
-  }
-
-/* --- PLAYER NAME + BEST SCORES (fissi in alto a destra) --- */
-.topRightBox {
-  position: fixed;
-  top: 8px;
-  right: 8px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  z-index: 999; /* sempre sopra al resto */
-}
-
-/* Nome giocatore */
-.playerName {
-  font-size: 9px;
-  color: var(--muted);
-  font-family: 'Press Start 2P', monospace;
-}
-
-/* Pulsante BEST SCORES */
-.bestBtn {
-  padding: 6px 8px;
-  background: #111;
-  border: 2px solid #000;
-  color: var(--text);
-  font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  
-}
-.bestBtn:hover {
-  background: var(--accent);
-  color: #000;
-  transform: translateY(-1px);
-}
-
-
-
+  .scan{ position:fixed; inset:0; pointer-events:none; background-image:linear-gradient(rgba(0,0,0,0.03) 50%, transparent 51%); background-size:100% 4px; opacity:0.35; }
+  .topRightBox { position: fixed; top: 8px; right: 8px; display: flex; align-items: center; gap: 8px; z-index: 999; }
+  .playerName { font-size: 9px; color: var(--muted); font-family: 'Press Start 2P', monospace; }
+  .bestBtn { padding: 6px 8px; background: #111; border: 2px solid #000; color: var(--text); font-family: 'Press Start 2P', monospace; font-size: 9px; border-radius: 4px; cursor: pointer; transition: all 0.15s ease; }
+  .bestBtn:hover { background: var(--accent); color: #000; transform: translateY(-1px); }
 </style>
 </head>
 <body>
 
 <div class="wrapper">
   <div class="logo">GBA — PixelSnake</div>
-
-  <!-- BEST SCORES and player name -->
   <button class="bestBtn" id="bestBtn" onclick="location.href='bestscores.html'">BEST SCORES</button>
   <div class="playerName" id="playerName">Player: —</div>
-
   <div class="canvasWrap">
     <canvas id="game" width="270" height="270"></canvas>
   </div>
-
   <div class="hud">
     <div>Punteggio: <span id="score">0</span></div>
     <div>Record: <span id="hs">0</span></div>
     <div id="message"></div>
   </div>
-
   <div class="controls">
     <div class="btn" id="btnRestart">RIAVVIA</div>
     <div class="btn" id="btnMenu" onclick="location.href='index.html'">MENU</div>
+    <div class="btn" id="btnDiff">DIFFICOLTÀ</div>
   </div>
-
   <div class="arrows">
-    <div class="arrow-row">
-      <div class="arrow" data-dir="up">▲</div>
-    </div>
-    <div class="arrow-row">
-      <div class="arrow" data-dir="left">◀</div>
-      <div class="arrow" data-dir="down">▼</div>
-      <div class="arrow" data-dir="right">▶</div>
-    </div>
+    <div class="arrow-row"><div class="arrow" data-dir="up">▲</div></div>
+    <div class="arrow-row"><div class="arrow" data-dir="left">◀</div><div class="arrow" data-dir="down">▼</div><div class="arrow" data-dir="right">▶</div></div>
   </div>
-
   <div style="font-size:9px;color:var(--muted);margin-top:4px;text-align:center;">Controlli: frecce / swipe / pulsanti</div>
 </div>
 
 <div class="scan"></div>
-<div class="footer">Versione Beta (1.0.1)</div>
+<div class="footer">Versione Beta (1.1.0)</div>
 <div class="credits">Fatto da Anto e ChatGPT</div>
 
 <script>
-/* ---------- Nick & scores utility ---------- */
+/* ---------- Utility punteggi ---------- */
 function getNick(){ return localStorage.getItem('gba_snake_nick') || null; }
-function getPersonalHS(){ return parseInt(localStorage.getItem('gba_snake_hs')||'0',10); }
-function setPersonalHS(v){ localStorage.setItem('gba_snake_hs', String(v)); }
 
-/* scores array stored as JSON array of {nick,score} */
+// Funzione per gestire record separati in modalità difficile
+function getPersonalHS(){
+  if(hardMode) return parseInt(localStorage.getItem('gba_snake_hs_hard')||'0',10);
+  else return parseInt(localStorage.getItem('gba_snake_hs')||'0',10);
+}
+function setPersonalHS(v){
+  if(hardMode) localStorage.setItem('gba_snake_hs_hard', String(v));
+  else localStorage.setItem('gba_snake_hs', String(v));
+}
+
 function readScores(){ try{ return JSON.parse(localStorage.getItem('gba_snake_scores')||'[]') }catch(e){ return []; } }
 function writeScores(arr){ localStorage.setItem('gba_snake_scores', JSON.stringify(arr)); }
-
-/* update global local leaderboard for a given nick with best score */
 function updateGlobalScores(nick, score){
   if(!nick) return;
   const arr = readScores();
   const idx = arr.findIndex(x=>x.nick===nick);
-  if(idx>=0){
-    if(score > arr[idx].score) arr[idx].score = score;
-  } else {
-    arr.push({nick: nick, score: score});
-  }
-  // sort desc by score
+  if(idx>=0){ if(score > arr[idx].score) arr[idx].score = score; }
+  else { arr.push({nick: nick, score: score}); }
   arr.sort((a,b)=>b.score - a.score || a.nick.localeCompare(b.nick));
   writeScores(arr);
 }
 
-/* ---------- Game code (unchanged logic) ---------- */
+/* ---------- Gioco ---------- */
 const canvas=document.getElementById('game'), ctx=canvas.getContext('2d');
-const GRID=15;
-let snake=[], dir={x:0,y:0}, food={x:0,y:0}, score=0, hs=parseInt(localStorage.getItem('gba_snake_hs')||0);
-let running=false, over=false, tick=130, timer=null, bonusFood=null;
-
+let GRID=15, snake=[], dir={x:0,y:0}, food={x:0,y:0}, bonusFood=null, obstacles=[], score=0;
+let hardMode=false;
+let hs=getPersonalHS();
+let running=false, over=false, tick=130, timer=null;
+const MAX_HUMAN_SCORE=125;
 const scoreEl=document.getElementById('score'), hsEl=document.getElementById('hs'), msg=document.getElementById('message');
+const playerNameEl=document.getElementById('playerName'); const nick=getNick();
+playerNameEl.textContent=nick ? ('Player: '+nick) : 'Player: (anon)';
 hsEl.textContent=hs;
 
-// display player name
-const playerNameEl = document.getElementById('playerName');
-const nick = getNick();
-playerNameEl.textContent = nick ? ('Player: '+nick) : 'Player: (anon)';
+function randPos(){ return {x:Math.floor(Math.random()*(canvas.width/GRID)),y:Math.floor(Math.random()*(canvas.height/GRID))}; }
+function safePos(pos){ if(!pos) return false; for(let o of obstacles) if(o.x===pos.x && o.y===pos.y) return false; for(let s of snake) if(s.x===pos.x && s.y===pos.y) return false; return true; }
+function randomObstacles(){ obstacles=[]; if(hardMode){ const count=8+Math.floor(Math.random()*4); for(let i=0;i<count;i++){ let p; do{ p=randPos(); } while(!safePos(p)); obstacles.push(p); } } }
+function placeFood(){ let f; do{ f = randPos(); } while(!safePos(f)); food = f; if(Math.random()<0.2){ let bf; do{ bf = randPos(); } while(!safePos(bf) || (bf.x===food.x && bf.y===food.y)); bonusFood = bf; } else bonusFood = null; }
 
-function randPos(){return{x:Math.floor(Math.random()*(canvas.width/GRID)),y:Math.floor(Math.random()*(canvas.height/GRID))};}
-function placeFood(){food=randPos();if(Math.random()<0.2)bonusFood=randPos();else bonusFood=null;}
-function reset(start=false){snake=[{x:9,y:9}];dir={x:0,y:0};score=0;over=false;running=false;msg.textContent='';placeFood();render();if(start)startLoop();}
-function startLoop(){if(timer)clearInterval(timer);timer=setInterval(loop,tick);running=true;}
-
-// --- SERPENTE aggiornato (con occhi e dettaglio migliorato) ---
-function drawSnakePart(s, index){
-  if(index===0){
-    // testa
-    ctx.fillStyle="#8EE5A6";
-    ctx.fillRect(s.x*GRID, s.y*GRID, GRID, GRID);
-    // contorno
-    ctx.strokeStyle="#2C8A4B";
-    ctx.strokeRect(s.x*GRID+1, s.y*GRID+1, GRID-2, GRID-2);
-    // occhi
-    ctx.fillStyle="#004400";
-    ctx.fillRect(s.x*GRID+3, s.y*GRID+3, 3, 3);
-    ctx.fillRect(s.x*GRID+GRID-6, s.y*GRID+3, 3, 3);
-  } else {
-    // corpo gradiente
-    ctx.fillStyle=`hsl(130, 40%, ${60 - index*2}%)`;
-    ctx.fillRect(s.x*GRID, s.y*GRID, GRID, GRID);
-    ctx.strokeStyle="#2C8A4B";
-    ctx.strokeRect(s.x*GRID+1, s.y*GRID+1, GRID-2, GRID-2);
-  }
+function reset(start=false){
+  snake=[{x:9,y:9}]; dir={x:0,y:0}; score=0; over=false; running=false; msg.textContent='';
+  randomObstacles(); placeFood(); hs=getPersonalHS(); hsEl.textContent=hs;
+  render(); if(start) startLoop();
 }
+function startLoop(){if(timer) clearInterval(timer); timer=setInterval(loop,tick); running=true;}
 
-function drawFood(f,bonus=false){
-  const grad=ctx.createRadialGradient((f.x+0.5)*GRID,(f.y+0.5)*GRID,2,(f.x+0.5)*GRID,(f.y+0.5)*GRID,GRID/2);
-  grad.addColorStop(0,bonus?'#ff9f00':'#ff4040');
-  grad.addColorStop(1,bonus?'#8a3d00':'#6a0000');
-  ctx.fillStyle=grad;
-  ctx.beginPath();
-  ctx.arc((f.x+0.5)*GRID,(f.y+0.5)*GRID,GRID/2.5,0,Math.PI*2);
-  ctx.fill();
-  ctx.fillStyle='#228b22';
-  ctx.fillRect((f.x+0.4)*GRID,(f.y-0.1)*GRID,GRID/5,GRID/4);
-}
+function drawSnakePart(s,i){ if(i===0){ ctx.fillStyle="#8EE5A6"; ctx.fillRect(s.x*GRID,s.y*GRID,GRID,GRID); ctx.strokeStyle="#2C8A4B"; ctx.strokeRect(s.x*GRID+1,s.y*GRID+1,GRID-2,GRID-2); ctx.fillStyle="#004400"; ctx.fillRect((s.x+0.2)*GRID,(s.y+0.2)*GRID,3,3); ctx.fillRect((s.x+0.6)*GRID,(s.y+0.2)*GRID,3,3); } else{ ctx.fillStyle=`hsl(130, 40%, ${60 - i*2}%)`; ctx.fillRect(s.x*GRID,s.y*GRID,GRID,GRID); ctx.strokeStyle="#2C8A4B"; ctx.strokeRect(s.x*GRID+1,s.y*GRID+1,GRID-2,GRID-2); } }
+function drawFood(f,bonus=false){ const g=ctx.createRadialGradient((f.x+0.5)*GRID,(f.y+0.5)*GRID,2,(f.x+0.5)*GRID,(f.y+0.5)*GRID,GRID/2); g.addColorStop(0,bonus?'#FFD700':'#ff4040'); g.addColorStop(1,bonus?'#FFA500':'#6a0000'); ctx.fillStyle=g; ctx.beginPath(); ctx.arc((f.x+0.5)*GRID,(f.y+0.5)*GRID,GRID/2.5,0,Math.PI*2); ctx.fill(); ctx.fillStyle='#228b22'; ctx.fillRect((f.x+0.4)*GRID,(f.y-0.1)*GRID,GRID/5,GRID/4); }
+function drawObstacles(){ctx.fillStyle="#552266"; obstacles.forEach(o=>ctx.fillRect(o.x*GRID,o.y*GRID,GRID,GRID)); }
+function render(){ ctx.fillStyle='#081018'; ctx.fillRect(0,0,canvas.width,canvas.height); if(bonusFood) drawFood(bonusFood,true); drawFood(food); drawObstacles(); snake.forEach((s,i)=>drawSnakePart(s,i)); scoreEl.textContent=score; hsEl.textContent=hs; }
 
-function render(){
-  ctx.fillStyle='#081018';ctx.fillRect(0,0,canvas.width,canvas.height);
-  if(bonusFood)drawFood(bonusFood,true);
-  drawFood(food);
-  snake.forEach((s,i)=>drawSnakePart(s,i));
-  scoreEl.textContent=score;hsEl.textContent=hs;
-}
+function endGame(){ over=true; running=false; clearInterval(timer); msg.textContent='Hai perso — punteggio: '+score; const curNick=getNick(); if(score>hs){ hs=score; setPersonalHS(score); msg.textContent='Nuovo record: '+hs; } if(curNick){ updateGlobalScores(curNick,hs); } setTimeout(()=>reset(true),1400); }
 
-function endGame(){
-  over=true;running=false;clearInterval(timer);
-  msg.textContent='Hai perso — punteggio: '+score;
-
-  // aggiorna record personale e la classifica locale (solo se nick presente)
-  const curNick = getNick();
-  if(score > hs){
-    hs = score;
-    setPersonalHS(hs);
-    msg.textContent = 'Nuovo record: '+hs;
-  }
-  // salviamo la classifica globale locale SOLO se l'utente ha scelto un nickname
-  if(curNick){
-    updateGlobalScores(curNick, hs);
-  }
-
-  // dopo 1400ms riavvia
-  setTimeout(()=>reset(true),1400);
-}
+function explodeGame(){ clearInterval(timer); running=false; msg.textContent='💥 CAMPIONE ASSOLUTO DI SNAKE! 💥'; let g=0; const gl=()=>{ctx.fillStyle=`hsl(${Math.random()*360},100%,50%)`;ctx.fillRect(0,0,canvas.width,canvas.height); ctx.font="12px 'Press Start 2P'";ctx.fillStyle="#fff";ctx.fillText("IL GIOCO È IMPAZZITO!!",20,135); if(++g<80)requestAnimationFrame(gl);else reset();}; gl(); }
 
 function loop(){
   if(!running||over)return;
   const head={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
-  if(head.x<0||head.y<0||head.x>=canvas.width/GRID||head.y>=canvas.height/GRID)return endGame();
-  for(let i=1;i<snake.length;i++)if(snake[i].x===head.x&&snake[i].y===head.y)return endGame();
+  if(head.x<0||head.y<0||head.x>=canvas.width/GRID||head.y>=canvas.height/GRID) return endGame();
+  for(let i=1;i<snake.length;i++) if(snake[i].x===head.x&&snake[i].y===head.y) return endGame();
+  for(let o of obstacles) if(o.x===head.x&&o.y===head.y) return endGame();
   snake.unshift(head);
-  if(head.x===food.x&&head.y===food.y){
+  if(head.x===food.x && head.y===food.y){
     score++;
-    if(score>hs){hs=score;setPersonalHS(hs);msg.textContent='Nuovo record: '+hs;}
-    placeFood();
-  }else if(bonusFood && head.x===bonusFood.x && head.y===bonusFood.y){
+    if(score>=60 && canvas.height<270+9*GRID){canvas.height+=9*GRID;canvas.width+=9*GRID; msg.textContent="Campo allungato!";}
+    if(score>MAX_HUMAN_SCORE) return explodeGame();
+    if(score>hs){ hs=score; setPersonalHS(hs); msg.textContent='Nuovo record: '+hs;}
+    placeFood(); if(hardMode) randomObstacles();
+  } else if(bonusFood && head.x===bonusFood.x && head.y===bonusFood.y){
     score+=2; bonusFood=null; msg.textContent='🍏 Mela dorata!';
-  }else snake.pop();
+  } else snake.pop();
   render();
 }
 
-// Controlli tastiera
-document.addEventListener('keydown',e=>{
-  if(e.key==='ArrowUp'&&dir.y!==1)dir={x:0,y:-1};
-  if(e.key==='ArrowDown'&&dir.y!==-1)dir={x:0,y:1};
-  if(e.key==='ArrowLeft'&&dir.x!==1)dir={x:-1,y:0};
-  if(e.key==='ArrowRight'&&dir.x!==-1)dir={x:1,y:0};
-  if(!running&&!over)startLoop();
-});
-
-// Swipe globale (ovunque sul campo)
+/* Controlli */
+document.addEventListener('keydown',e=>{ if(e.key==='ArrowUp'&&dir.y!==1) dir={x:0,y:-1}; if(e.key==='ArrowDown'&&dir.y!==-1) dir={x:0,y:1}; if(e.key==='ArrowLeft'&&dir.x!==1) dir={x:-1,y:0}; if(e.key==='ArrowRight'&&dir.x!==-1) dir={x:1,y:0}; if(!running&&!over) startLoop(); });
 let sx=0,sy=0;
-document.addEventListener('touchstart',e=>{
-  const t=e.touches[0];sx=t.clientX;sy=t.clientY;
+document.addEventListener('touchstart',e=>{const t=e.touches[0]; sx=t.clientX; sy=t.clientY;},{passive:true});
+document.addEventListener('touchend',e=>{const t=e.changedTouches[0]; const dx=t.clientX-sx, dy=t.clientY-sy;
+  if(Math.abs(dx)>Math.abs(dy)){ if(dx>0&&dir.x!==-1) dir={x:1,y:0}; if(dx<0&&dir.x!==1) dir={x:-1,y:0};}
+  else{ if(dy>0&&dir.y!==-1) dir={x:0,y:1}; if(dy<0&&dir.y!==1) dir={x:0,y:-1};}
+  if(!running&&!over) startLoop();
 },{passive:true});
-document.addEventListener('touchend',e=>{
-  const t=e.changedTouches[0];const dx=t.clientX-sx,dy=t.clientY-sy;
-  if(Math.abs(dx)>Math.abs(dy)){
-    if(dx>0&&dir.x!==-1)dir={x:1,y:0};
-    if(dx<0&&dir.x!==1)dir={x:-1,y:0};
-  }else{
-    if(dy>0&&dir.y!==-1)dir={x:0,y:1};
-    if(dy<0&&dir.y!==1)dir={x:0,y:-1};
-  }
+document.querySelectorAll('.arrow').forEach(a=>{a.addEventListener('click',()=>{const d=a.dataset.dir;
+  if(d==='up'&&dir.y!==1)dir={x:0,y:-1};
+  if(d==='down'&&dir.y!==-1)dir={x:0,y:1};
+  if(d==='left'&&dir.x!==1)dir={x:-1,y:0};
+  if(d==='right'&&dir.x!==-1)dir={x:1,y:0};
   if(!running&&!over)startLoop();
-},{passive:true});
-
-// Frecce virtuali
-document.querySelectorAll('.arrow').forEach(a=>{
-  a.addEventListener('click',()=>{
-    const d=a.dataset.dir;
-    if(d==='up'&&dir.y!==1)dir={x:0,y:-1};
-    if(d==='down'&&dir.y!==-1)dir={x:0,y:1};
-    if(d==='left'&&dir.x!==1)dir={x:-1,y:0};
-    if(d==='right'&&dir.x!==-1)dir={x:1,y:0};
-    if(!running&&!over)startLoop();
-  });
-});
+});});
 
 document.getElementById('btnRestart').addEventListener('click',()=>reset(true));
-reset(true);render();
+document.getElementById('btnDiff').addEventListener('click',()=>{
+  hardMode=!hardMode;
+  msg.textContent=hardMode?"Modalità Difficile: ON":"Modalità Difficile: OFF";
+  reset(true);
+});
+
+reset(true); render();
 </script>
 </body>
 </html>
