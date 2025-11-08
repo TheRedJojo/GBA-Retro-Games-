@@ -72,13 +72,8 @@ const meteor = new Image();
 meteor.src = 'meteor.png';
 
 // ===== High Score =====
-function getHighScore(){
-  return parseInt(localStorage.getItem('gba_snake_hs') || '0');
-}
-
-function setHighScore(val){
-  localStorage.setItem('gba_snake_hs', val);
-}
+function getHighScore(){ return parseInt(localStorage.getItem('gba_space_hs') || '0'); }
+function setHighScore(val){ localStorage.setItem('gba_space_hs', val); }
 
 // ===== Utility =====
 function rand(min, max){ return Math.random() * (max - min) + min; }
@@ -115,26 +110,33 @@ let shooting = false;
   btn.addEventListener('touchend', ()=> moveLeft = moveRight = false);
 });
 
-// ===== Touch per sparare e muovere navicella =====
+// ===== Touch per sparare e muovere navicella corretto =====
+function getTouchPos(touch){
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: (touch.clientX - rect.left) * scaleX - player.w / 2,
+    y: (touch.clientY - rect.top) * scaleY - player.h / 2
+  };
+}
+
 canvas.addEventListener('touchstart', e => {
   e.preventDefault();
   shooting = true;
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  player.x = touch.clientX - rect.left - player.w/2;
-  player.y = touch.clientY - rect.top - player.h/2;
+  const pos = getTouchPos(e.touches[0]);
+  player.x = pos.x;
+  player.y = pos.y;
 });
 
 canvas.addEventListener('touchmove', e => {
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  player.x = touch.clientX - rect.left - player.w/2;
-  player.y = touch.clientY - rect.top - player.h/2;
+  e.preventDefault();
+  const pos = getTouchPos(e.touches[0]);
+  player.x = pos.x;
+  player.y = pos.y;
 });
 
-canvas.addEventListener('touchend', e => {
-  shooting = false;
-});
+canvas.addEventListener('touchend', e => { shooting = false; });
 
 // ===== Game Logic =====
 function shoot(){
@@ -153,12 +155,10 @@ function spawnEnemy(){
 function update(){
   if(!gameRunning) return;
 
-  // Move player
   if(keys['ArrowLeft'] || keys['a'] || moveLeft) player.x -= player.speed;
   if(keys['ArrowRight'] || keys['d'] || moveRight) player.x += player.speed;
   player.x = Math.max(0, Math.min(WIDTH - player.w, player.x));
 
-  // Sparo automatico
   if((keys[' '] || keys['ArrowUp'] || keys['w'] || shooting) && player.cooldown <= 0) shoot();
   if(player.cooldown > 0) player.cooldown--;
 
@@ -168,7 +168,6 @@ function update(){
   enemies.forEach(e => e.y += e.speed);
   enemies = enemies.filter(e => e.y < HEIGHT + e.h);
 
-  // Bullet hits enemy
   for(let i=enemies.length-1; i>=0; i--){
     let e = enemies[i];
     for(let j=bullets.length-1; j>=0; j--){
@@ -183,7 +182,6 @@ function update(){
     }
   }
 
-  // Enemy hits player
   for(let e of enemies){
     if(e.x < player.x + player.w && e.x + e.w > player.x && e.y < player.y + player.h && e.y + e.h > player.y){
       e.y = HEIGHT + 50;
@@ -202,7 +200,6 @@ function update(){
     }
   }
 
-  // Controllo vincitore assoluto
   if(score >= 50000 && !document.getElementById('winnerOverlay')){
     showWinner();
   }
@@ -308,10 +305,7 @@ function showWinner(){
     });
   }
 
-  // Rimuove overlay dopo 7 secondi
-  setTimeout(() => {
-    hideWinner();
-  },7000);
+  setTimeout(() => hideWinner(),7000);
 }
 
 function hideWinner(){
