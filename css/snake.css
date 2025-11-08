@@ -1,0 +1,402 @@
+:root {
+  --bg: #000010;
+  --panel: #0d0d1a;
+  --accent: #FFD27F;
+  --accent2: #f400fc;
+  --text: #EAEAEA;
+  --muted: #999;
+  --danger: #FF3B3B;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+  background: url("img/snakeback.gif") center center / cover no-repeat fixed;
+  background-color: #000010;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  image-rendering: pixelated;
+}
+
+/* Effetto scanline su tutta la pagina */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,0,0,0.15) 50%, rgba(255,255,255,0.02) 51%);
+  background-size: 100% 3px;
+  opacity: .3;
+  z-index: 1000;
+}
+
+/* Contenitore principale */
+.wrapper {
+  width: 90vw;
+  max-width: 360px;
+  background: linear-gradient(180deg, rgba(20,20,40,0.9), rgba(0,0,10,0.95));
+  border: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 0 10px #ffd27faa, inset 0 0 10px #ffd27f44;
+  position: relative;
+  backdrop-filter: blur(3px);
+}
+.buns {
+  width: 90vw;
+  max-width: 360px;
+  background: linear-gradient(180deg, rgba(20,20,40,0.9), rgba(0,0,10,0.95));
+  border: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  gap: 10px;
+  box-shadow: 0 0 10px #ffd27faa, inset 0 0 10px #ffd27f44;
+  position: relative;
+  backdrop-filter: blur(3px);
+}
+
+/* Put wrapper slightly above center so top-right box doesn't overlap badly on small screens */
+@media (min-height: 700px) {
+  .wrapper { transform: translateY(-10px); }
+}
+
+.logo {
+  color: var(--accent);
+  font-size: 10px;
+  text-align: center;
+  text-shadow: 0 0 6px #ffd27f90;
+}
+
+/* Canvas container */
+.canvasWrap {
+  width: 100%;
+  border: 3px solid var(--accent2);
+  border-radius: 6px;
+  padding: 6px;
+  background: #081018;
+  box-shadow: 0 0 8px #00ff8070, inset 0 0 5px #000;
+}
+
+canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #07101a;
+  border: 2px solid #000;
+  image-rendering: pixelated;
+}
+/* Campo nickname */
+.nickBox input {
+  width: 130px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: #000010;
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  outline: none;
+  transition: box-shadow .15s;
+}
+.nickBox input:focus {
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+/* Bottone login */
+.nickBox button {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: var(--accent2);
+  color: #000;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  transition: transform .1s, filter .1s, box-shadow .1s;
+}
+.nickBox button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.3);
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+/* HUD */
+.hud {
+  width: 100%;
+  color: var(--text);
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-shadow: 1px 1px #000;
+}
+
+#message {
+  color: var(--accent);
+  min-height: 16px;
+  text-align: center;
+  font-size: 9px;
+}
+
+/* ✅ Controlli fissi a sinistra, stile grigio chiaro/scuro */
+.controls {
+  position: fixed;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 200;
+  width: 160px;
+  align-items: stretch;
+}
+
+/* ✅ Pulsanti effetto grigio */
+.btn {
+  width: 100%;
+  padding: 10px 8px;
+  background: linear-gradient(180deg, var(--btn-light), var(--btn-dark));
+  border: 3px solid #000;
+  color: var(--text);
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  transition: transform .12s, background .12s, box-shadow .12s;
+  box-shadow: inset 0 0 5px #000, 0 3px 0 #000;
+}
+.btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, #e0e0e0, #777);
+  color: #000;
+  box-shadow: 0 0 10px #bbb;
+}
+
+
+
+.bestBtn { order: 1; align-self: stretch; text-align:center; }
+
+/* Frecce direzionali */
+.arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 6px;
+  gap: 4px;
+}
+
+.arrow-row {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+.arrow {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(180deg,#151530,#0a0a20);
+  border: 3px solid #000;
+  border-radius: 6px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: inset 0 0 5px #000;
+  transition: 0.1s;
+}
+
+.arrow:active {
+  background: var(--accent2);
+  color: #000;
+  box-shadow: 0 0 8px var(--accent2);
+}
+
+
+/* Box in alto a destra */
+.topRightBox {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 999;
+  background: linear-gradient(180deg, #12122e, #07071a);
+  border: 3px solid var(--accent2);
+  padding: 8px 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 12px #00ff8090;
+  backdrop-filter: blur(2px);
+}
+
+.playerName {
+  font-size: 9px;
+  color: var(--accent2);
+  font-family: 'Press Start 2P', monospace;
+  text-shadow: 0 0 2px #000;
+}
+
+.bestBtn {
+  padding: 6px 8px;
+  background: linear-gradient(180deg, #151530, #0a0a20);
+  border: 3px solid #000;
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transform .12s, background .12s, box-shadow .12s;
+  box-shadow: inset 0 0 5px #000, 0 3px 0 #000;
+}
+
+.bestBtn:hover {
+  background: var(--accent2);
+  color: #000;
+  box-shadow: 0 0 10px var(--accent2);
+  transform: translateY(-3px);
+}
+
+/* Effetto scan */
+.scan {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,0,0,0.05) 50%, rgba(255,255,255,0.02) 51%);
+  background-size: 100% 4px;
+  opacity: 0.25;
+}
+
+/* small additions for modal and select (kept minimal) */
+.hof-select {
+  margin-top: 6px;
+  font-size: 9px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 2px solid #000;
+  background: linear-gradient(180deg,#0d0d1a,#07071a);
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* modal for pre-page */
+#skinModal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(4px);
+}
+#skinModal .panel {
+  width: 320px;
+  max-width: 90%;
+  background: linear-gradient(180deg,#0b0b16,#06060b);
+  padding: 14px;
+  border-radius: 8px;
+  border: 3px solid var(--accent);
+  box-shadow: 0 0 20px #000;
+  text-align:center;
+  color:var(--text);
+  font-size:10px;
+}
+/* nickname/login box */
+.nickBox {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(15,25,35,0.8);
+  border: 3px solid var(--accent2);
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 50;
+  box-shadow: 0 0 12px #00ff8090;
+  backdrop-filter: blur(3px);
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Campo nickname */
+.nickBox input {
+  width: 130px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: #000010;
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  outline: none;
+  transition: box-shadow .15s;
+}
+.nickBox input:focus {
+  box-shadow: 0 0 6px var(--accent2);
+  font-family: 'Press Start 2P', monospace;
+}
+
+/* Bottone login */
+.nickBox button {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: var(--accent2);
+  color: #000;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  transition: transform .1s, filter .1s, box-shadow .1s;
+}
+.nickBox button:hover {
+  font-family: 'Press Start 2P', monospace;
+  transform: scale(1.05);
+  filter: brightness(1.3);
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+/* footer/crediti */
+.footer, .credits {
+  font-size: 10px;
+  color: var(--muted);
+  position: fixed;
+  text-shadow: 1px 1px #000;
+  z-index: 20;
+}
+.footer {
+  bottom: 25px;
+  left: 10px;
+  text-align: left;
+}
+.credits {
+  bottom: 25px;
+  right: 10px;
+  text-align: right;
+}
+
+.skin-grid { display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:10px 0; }
+.skin-item { width:46px; height:46px; border-radius:6px; border:3px solid #000; cursor:pointer; box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.6);}
+.skin-item.selected { outline:3px solid var(--accent2); transform:translateY(-4px); }
+#skinSave { margin-top:8px; padding:8px 10px; font-size:9px; border-radius:6px; border:3px solid #FFD27F; cursor:pointer;font-family: 'Press Start 2P', monospace; }

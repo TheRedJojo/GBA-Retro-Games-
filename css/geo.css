@@ -1,0 +1,238 @@
+:root {
+  --bg: #000010;
+  --panel: #0d0d1a;
+  --accent: #FFD27F;
+  --accent2: #5CFF5C;
+  --text: #EAEAEA;
+  --muted: #999;
+  --danger: #FF3B3B;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+  background: url("img/geoack.gif") center center / cover no-repeat fixed;
+  background-color: #000010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  image-rendering: pixelated;
+}
+
+/* Effetto CRT scanline su tutto */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,0,0,0.15) 50%, rgba(255,255,255,0.02) 51%);
+  background-size: 100% 3px;
+  opacity: .3;
+  z-index: 1000;
+}
+
+/* Frame principale */
+.frame {
+  width: min(760px, 96vw);
+  background: linear-gradient(180deg, rgba(20,20,40,0.9), rgba(0,0,10,0.95));
+  border: 3px solid var(--accent);
+  padding: 18px;
+  display: flex;
+  gap: 12px;
+  flex-direction: column;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #ffd27faa, inset 0 0 10px #ffd27f44;
+  position: relative;
+  backdrop-filter: blur(3px);
+}
+
+.left, .right {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Canvas e contenitore */
+.canvas {
+  background: #081018;
+  padding: 8px;
+  border: 3px solid var(--accent2);
+  border-radius: 6px;
+  box-shadow: 0 0 8px #00ff8070, inset 0 0 5px #000;
+}
+/* nickname/login box - spostata in alto a destra della pagina */
+.nickBox {
+  position: fixed;      /* fissa alla pagina */
+  top: 10px;            /* stessa altezza del reset */
+  right: 10px;          /* lato destro della finestra */
+  background: linear-gradient(180deg, #12122e, #07071a);
+  border: 3px solid var(--accent2);
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 50;          /* uguale o leggermente inferiore al reset */
+  box-shadow: 0 0 12px #00ff8090;
+  backdrop-filter: blur(2px);
+}
+
+/* Campo nickname */
+.nickBox input {
+  width: 130px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: #000010;
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  outline: none;
+  transition: box-shadow .15s;
+}
+.nickBox input:focus {
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+/* Bottone login */
+.nickBox button {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: var(--accent2);
+  color: #000;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  transition: transform .1s, filter .1s, box-shadow .1s;
+}
+.nickBox button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.3);
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+canvas {
+  background: #07101a;
+  image-rendering: pixelated;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Pulsanti */
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #151530, #0a0a20);
+  border: 3px solid #000;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 10px;
+  transition: transform .12s, background .12s, box-shadow .12s;
+  box-shadow: inset 0 0 5px #000, 0 3px 0 #000;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, var(--accent), #ff9c5c);
+  color: #000;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* HUD */
+.hud {
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* Scanlines */
+.scan {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,0,0,0.05) 50%, rgba(255,255,255,0.02) 51%);
+  background-size: 100% 4px;
+  opacity: 0.25;
+}
+
+/* Footer e crediti */
+.footer, .credits {
+  font-size: 10px;
+  color: var(--muted);
+  position: fixed;
+  text-shadow: 1px 1px #000;
+  z-index: 20;
+}
+
+.footer {
+  bottom: 25px;
+  left: 10px;
+  text-align: left;
+}
+
+.credits {
+  bottom: 25px;
+  right: 10px;
+  text-align: right;
+}
+
+/* Nickname in alto */
+.nickname {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  color: var(--accent2);
+  font-size: 10px;
+  text-shadow: 0 0 2px #000;
+}
+
+/* Controlli touch */
+.touch-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.touch-btn {
+  padding: 10px;
+  background: linear-gradient(180deg,#151530,#0a0a20);
+  color: var(--text);
+  border: 3px solid #000;
+  border-radius: 6px;
+  font-size: 12px;
+  flex: 1 1 30%;
+  text-align: center;
+  user-select: none;
+  transition: 0.1s;
+  box-shadow: inset 0 0 5px #000;
+}
+
+.touch-btn:active {
+  background: var(--accent2);
+  color: #000;
+  box-shadow: 0 0 8px var(--accent2);
+}
+
+/* Mobile */
+@media(max-width:760px){
+  .frame{flex-direction:column;}
+}

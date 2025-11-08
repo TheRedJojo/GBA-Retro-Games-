@@ -1,0 +1,179 @@
+:root {
+  --bg:#000010;
+  --panel:#0d0d1a;
+  --accent:#FF4444;
+  --accent2:#5CFF5C;
+  --text:#EAEAEA;
+  --muted:#999;
+  --danger:#FF3B3B;
+}
+
+/* SFONDO GIF REALE */
+html, body {
+  overflow: hidden;
+  height: 100%;
+  margin: 0;
+  font-family: 'Press Start 2P', monospace;
+  background: url("img/trisback.gif") center center / cover no-repeat fixed;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  image-rendering: pixelated;
+}
+
+/* Effetto CRT scanline su tutto */
+body::after {
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background-image:linear-gradient(rgba(0,0,0,0.15) 50%, rgba(255,255,255,0.02) 51%);
+  background-size:100% 3px;
+  opacity:.3;
+  z-index:1000;
+}
+
+/* Cornice principale */
+.frame {
+  width: 95vw;
+  max-width: 420px;
+  background: rgba(10,10,20,0.75);
+  border: 3px solid var(--accent);
+  padding: 18px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  box-shadow: 0 0 10px #ff0000aa, inset 0 0 10px #ff000044;
+  backdrop-filter: blur(4px);
+}
+
+/* Header */
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  color: var(--accent);
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px #000;
+}
+
+/* Pulsanti in alto */
+.controls { display: flex; gap: 8px; }
+
+.btn {
+  padding: 8px 10px;
+  background: rgba(10,10,30,0.8);
+  border: 3px solid #000;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 10px;
+  transition: transform .12s, background .12s, box-shadow .12s;
+  box-shadow: inset 0 0 5px #000, 0 3px 0 #000;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(180deg, var(--accent), #ff9c5c);
+  color: #000;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Griglia del gioco */
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.cell {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: rgba(0,0,20,0.6);
+  border: 2px solid var(--accent2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 0 8px #00ff8070, inset 0 0 5px #000;
+  transition: transform .1s, filter .1s;
+}
+.cell:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
+}
+
+.cell span {
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--accent2);
+  pointer-events: none;
+  text-shadow: 2px 2px #000;
+}
+
+/* HUD punteggi e stato */
+.hud {
+  font-size: 12px;
+  color: var(--text);
+  text-align: center;
+  text-shadow: 1px 1px #000;
+}
+
+/* Modalità selezione */
+.mode-select {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Scan aggiuntivo */
+.scan {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,0,0,0.05) 50%, rgba(255,255,255,0.02) 51%);
+  background-size: 100% 4px;
+  opacity: 0.25;
+}
+
+/* Footer e crediti */
+.footer, .credits {
+  font-size: 10px;
+  color: var(--muted);
+  position: fixed;
+  text-shadow: 1px 1px #000;
+  z-index: 20;
+}
+.footer {
+  bottom: 25px;
+  left: 10px;
+  text-align: left;
+}
+.credits {
+  bottom: 25px;
+  right: 10px;
+  text-align: right;
+}
+
+@media(max-width:400px){
+  .frame { max-width: 100%; padding: 12px; }
+  .btn { font-size: 9px; padding: 6px 8px; }
+  .hud { font-size: 11px; }
+  .cell span { font-size: 1.6rem; }
+}
