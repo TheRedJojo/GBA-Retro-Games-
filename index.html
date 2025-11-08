@@ -94,7 +94,9 @@ document.getElementById('resetBtn').addEventListener('click', ()=>{
   if(!confirm('⚠️ Azione: resettare tutti i dati locali del gioco?')) return;
   localStorage.removeItem('gba_snake_nick');
   localStorage.removeItem('gba_snake_hs');
+  localStorage.removeItem('gba_snake_hs_hard')
   localStorage.removeItem('gba_snake_scores');
+  localStorage.removeItem('gba_space_hs')
   location.reload();
 });
 
