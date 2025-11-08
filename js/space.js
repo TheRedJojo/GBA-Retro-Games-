@@ -1,4 +1,5 @@
-const nickBox = document.getElementById('nickBox');
+const nickBox = document.getElementById('nickBox'); 
+
 function renderNickBox(){
   const nick = localStorage.getItem('gba_snake_nick');
   nickBox.innerHTML = '';
@@ -27,50 +28,83 @@ function renderNickBox(){
     nickBox.appendChild(btn);
   }
 }
+
+// Blocca pinch-to-zoom su mobile
+document.addEventListener('touchmove', function(e){
+  if(e.scale !== undefined && e.scale !== 1) e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('gesturestart', e => e.preventDefault());
+document.addEventListener('gesturechange', e => e.preventDefault());
+document.addEventListener('gestureend', e => e.preventDefault());
+
+// Blocca zoom con Ctrl + scroll o Ctrl + +/-
+window.addEventListener('wheel', function(e){
+  if(e.ctrlKey) e.preventDefault();
+}, { passive: false });
+
+window.addEventListener('keydown', function(e){
+  if((e.ctrlKey || e.metaKey) && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0')){
+    e.preventDefault();
+  }
+});
+
 renderNickBox();
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const startBtn = document.getElementById('btnStart');
-const fullBtn = document.getElementById('btnFull');
 const scoreEl = document.getElementById('score');
 const livesEl = document.getElementById('lives');
+const highScoreEl = document.getElementById('highScore');
+const gameOverEl = document.getElementById('gameOver');
 
 let player, bullets, enemies, particles;
 let keys = {};
 let score = 0, lives = 3, gameRunning = false;
-
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 
 // ===== Caricamento immagini =====
 const nav = new Image();
 nav.src = 'nav.png';
-
 const meteor = new Image();
 meteor.src = 'meteor.png';
+
+// ===== High Score =====
+function getHighScore(){
+  return parseInt(localStorage.getItem('gba_snake_hs') || '0');
+}
+
+function setHighScore(val){
+  localStorage.setItem('gba_snake_hs', val);
+}
 
 // ===== Utility =====
 function rand(min, max){ return Math.random() * (max - min) + min; }
 
 function resetGame(){
-  player = {x: WIDTH/2-32, y: HEIGHT-80, w: 64, h: 64, speed: 5, cooldown: 0};
+  player = {x: WIDTH/2-32, y: HEIGHT-80, w: 64, h: 64, speed: 5, cooldown: 0, hit: false};
   bullets = [];
   enemies = [];
   particles = [];
   score = 0;
   lives = 3;
   gameRunning = true;
+  shooting = false;
+  gameOverEl.style.display = 'none';
+  hideWinner();
+  updateHUD();
 }
 
 // ===== Controls =====
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
 
-// Touch controls
 const leftBtn = document.getElementById('leftBtn');
 const rightBtn = document.getElementById('rightBtn');
-const shootBtn = document.getElementById('shootBtn');
 let moveLeft = false, moveRight = false;
+let shooting = false;
 
 [leftBtn, rightBtn].forEach(btn=>{
   btn.addEventListener('touchstart', e=>{
@@ -81,17 +115,25 @@ let moveLeft = false, moveRight = false;
   btn.addEventListener('touchend', ()=> moveLeft = moveRight = false);
 });
 
-shootBtn.addEventListener('touchstart', e=>{
+// ===== Touch per sparare e muovere navicella =====
+canvas.addEventListener('touchstart', e => {
   e.preventDefault();
-  shoot();
-});
-
-// Touch drag movement
-canvas.addEventListener('touchmove', e=>{
+  shooting = true;
   const touch = e.touches[0];
   const rect = canvas.getBoundingClientRect();
   player.x = touch.clientX - rect.left - player.w/2;
   player.y = touch.clientY - rect.top - player.h/2;
+});
+
+canvas.addEventListener('touchmove', e => {
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  player.x = touch.clientX - rect.left - player.w/2;
+  player.y = touch.clientY - rect.top - player.h/2;
+});
+
+canvas.addEventListener('touchend', e => {
+  shooting = false;
 });
 
 // ===== Game Logic =====
@@ -116,7 +158,8 @@ function update(){
   if(keys['ArrowRight'] || keys['d'] || moveRight) player.x += player.speed;
   player.x = Math.max(0, Math.min(WIDTH - player.w, player.x));
 
-  if((keys[' '] || keys['ArrowUp'] || keys['w']) && player.cooldown <= 0) shoot();
+  // Sparo automatico
+  if((keys[' '] || keys['ArrowUp'] || keys['w'] || shooting) && player.cooldown <= 0) shoot();
   if(player.cooldown > 0) player.cooldown--;
 
   bullets.forEach(b => b.y -= b.speed);
@@ -125,7 +168,7 @@ function update(){
   enemies.forEach(e => e.y += e.speed);
   enemies = enemies.filter(e => e.y < HEIGHT + e.h);
 
-  // Collisions
+  // Bullet hits enemy
   for(let i=enemies.length-1; i>=0; i--){
     let e = enemies[i];
     for(let j=bullets.length-1; j>=0; j--){
@@ -143,32 +186,46 @@ function update(){
   // Enemy hits player
   for(let e of enemies){
     if(e.x < player.x + player.w && e.x + e.w > player.x && e.y < player.y + player.h && e.y + e.h > player.y){
-      createExplosion(player.x+player.w/2, player.y+player.h/2, 'danger');
+      e.y = HEIGHT + 50;
       lives--;
-      e.y = HEIGHT+50;
-      if(lives<=0){ gameRunning = false; alert('GAME OVER!'); }
+
+      player.hit = true;
+      setTimeout(() => { player.hit = false; }, 500);
+
+      createExplosion(player.x + player.w/2, player.y + player.h/2, 'danger');
+
+      if(lives <= 0){
+        gameRunning = false;
+        gameOverEl.style.display = 'block';
+        if(score > getHighScore()) setHighScore(score);
+      }
     }
+  }
+
+  // Controllo vincitore assoluto
+  if(score >= 50000 && !document.getElementById('winnerOverlay')){
+    showWinner();
   }
 
   updateParticles();
   spawnEnemy();
-
-  scoreEl.textContent = `SCORE: ${score.toString().padStart(4,'0')}`;
-  livesEl.textContent = '❤️'.repeat(lives);
-
+  updateHUD();
 }
 
+// ===== Draw =====
 function draw(){
   ctx.clearRect(0,0,WIDTH,HEIGHT);
-    
-  // Navicella
-  ctx.drawImage(nav, player.x, player.y, player.w, player.h);
 
-  // Proiettili
+  if(player.hit){
+    ctx.fillStyle = '#FF3B3B';
+    ctx.fillRect(player.x, player.y, player.w, player.h);
+  } else {
+    ctx.drawImage(nav, player.x, player.y, player.w, player.h);
+  }
+
   ctx.fillStyle = '#FFD27F';
   bullets.forEach(b => ctx.fillRect(b.x,b.y,b.w,b.h));
 
-  // Meteore
   enemies.forEach(e => ctx.drawImage(meteor, e.x, e.y, e.w, e.h));
 
   drawParticles();
@@ -209,13 +266,62 @@ function drawParticles(){
   }
 }
 
+// ===== HUD =====
+function updateHUD(){
+  scoreEl.textContent = `💎 SCORE: ${score.toString().padStart(4,'0')}`;
+  livesEl.textContent = '❤️'.repeat(lives);
+  highScoreEl.textContent = `🏆 HIGH SCORE: ${getHighScore()}`;
+}
+
+// ===== Winner Overlay =====
+function showWinner(){
+  const overlay = document.createElement('div');
+  overlay.id = 'winnerOverlay';
+  overlay.style.textAlign = 'center'; 
+  overlay.style.position = 'fixed';
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.width = '100%';
+  overlay.style.height = '100%';
+  overlay.style.background = 'rgba(0,0,0,0.85)';
+  overlay.style.color = 'gold';
+  overlay.style.fontSize = '30px';
+  overlay.style.fontFamily = 'Press Start 2P';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.flexDirection = 'column';
+  overlay.style.zIndex = 9999;
+  overlay.textContent = '🏆 SEI IL VINCITORE ASSOLUTO!\n HAI RAGGIUNTO IL PUNTEGGIO MASSIMO DI\n 50.000 pt!';
+
+  document.body.appendChild(overlay);
+
+  // Piccoli coriandoli
+  for(let i=0;i<100;i++){
+    particles.push({
+      x: rand(0, WIDTH),
+      y: rand(0, HEIGHT),
+      vx: rand(-3,3),
+      vy: rand(-3,3),
+      life: rand(50,100),
+      color: `hsl(${rand(0,360)},100%,60%)`
+    });
+  }
+
+  // Rimuove overlay dopo 7 secondi
+  setTimeout(() => {
+    hideWinner();
+  },7000);
+}
+
+function hideWinner(){
+  const overlay = document.getElementById('winnerOverlay');
+  if(overlay) overlay.remove();
+}
+
 // ===== Buttons =====
 startBtn.onclick = ()=>{ resetGame(); };
-fullBtn.onclick = ()=>{
-  if(!document.fullscreenElement) canvas.requestFullscreen();
-  else document.exitFullscreen();
-};
 
-// Start loop
+// ===== Start loop =====
 resetGame();
 gameLoop();

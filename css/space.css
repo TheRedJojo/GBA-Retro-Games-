@@ -259,20 +259,3 @@ canvas {
           drop-shadow(0 0 15px rgba(255,50,0,0.3));
 }
 
-
-/* === PULSANTE FULLSCREEN === */
-#fullscreenBtn {
-  background-image: url(img/spaceback.gif);  
-  border: 2px solid var(--accent);
-  color: var(--accent);
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 14px;
-  border-radius: 4px;
-  transition: 0.15s;
-}
-
-#fullscreenBtn:hover {
-  background-image: url(img/spaceback.gif);
-  box-shadow: 0 0 10px var(--accent);
-}

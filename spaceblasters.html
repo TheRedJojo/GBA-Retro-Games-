@@ -9,6 +9,22 @@
   <link rel="website icon" type="png" href="nav.png">
 </head>
 <body>
+    <div id="gameOver" style="
+        display: none;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #FF3B3B;
+        font-family: 'Press Start 2P', monospace;
+        font-size: 32px;
+        text-align: center;
+        text-shadow: 2px 2px #000;
+        z-index: 1000;
+        ">
+        GAME OVER 
+    </div>
+
     <!-- nickname box -->
    <div class="nickBox" id="nickBox"></div>
   <div class="frame">
@@ -16,8 +32,9 @@
     <div class="hud">
       <span id="score">💎SCORE: 0000</span>
       <span align = "right" id="lives">❤️LIVES: 3</span>
+      <span align = "center" id="highScore">🏆 HIGH SCORE: 0</span>
     </div>
-
+    
     <!-- Canvas principale -->
     <div class="canvas">
       <canvas id="gameCanvas" width="640" height="480"></canvas>
@@ -26,7 +43,7 @@
     <!-- Pulsanti principali -->
     <div class="controls">
       <div class="btn" id="btnStart">▶ START</div>
-      <div class="btn" id="btnFull">🖥️ FULLSCREEN</div>
+      <div class="btn" onclick="location.href='index.html'">MENU'</div>
     </div>
 
     <!-- Controlli touch con emoji -->
