@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <title>Space Blasters - GBA (NES)</title>
+  <link rel="stylesheet" href="css/space.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="website icon" type="png" href="nav.png">
+</head>
+<body>
+    <!-- nickname box -->
+   <div class="nickBox" id="nickBox"></div>
+  <div class="frame">
+    <!-- HUD con emoji e stile retro -->
+    <div class="hud">
+      <span id="score">💎SCORE: 0000</span>
+      <span align = "right" id="lives">❤️LIVES: 3</span>
+    </div>
+
+    <!-- Canvas principale -->
+    <div class="canvas">
+      <canvas id="gameCanvas" width="640" height="480"></canvas>
+    </div>
+
+    <!-- Pulsanti principali -->
+    <div class="controls">
+      <div class="btn" id="btnStart">▶ START</div>
+      <div class="btn" id="btnFull">🖥️ FULLSCREEN</div>
+    </div>
+
+    <!-- Controlli touch con emoji -->
+    <div class="touch-controls" id="touchControls">
+      <div class="touch-btn" id="leftBtn">⬅️</div>
+      <div class="touch-btn" id="rightBtn">➡️</div>
+      <div class="touch-btn" id="shootBtn">🔥💥</div>
+    </div>
+  </div>
+
+  <!-- Effetto scanline retro (se usi nel CSS) -->
+  <div class="scan"></div>
+
+  <script src="js/space.js"></script>
+</body>
+</html>

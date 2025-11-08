@@ -1,0 +1,278 @@
+:root {
+  --bg: #000010;
+  --panel: #0d0d1a;
+  --accent: #FFD27F;
+  --accent2: #5CFF5C;
+  --text: #EAEAEA;
+  --muted: #999;
+  --danger: #FF3B3B;
+}
+
+/* === STRUTTURA BASE === */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: 'Press Start 2P', monospace;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  image-rendering: pixelated;
+  cursor: none;
+  background-image: url(img/tumblr_6720afe4b23fff20fb0a55a8733db945_b6f51cdd_400.webp);
+}
+/* nickname/login box */
+.nickBox {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: rgba(15,25,35,0.8);
+  border: 3px solid var(--accent2);
+  padding: 10px 12px;
+  border-radius: 8px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  z-index: 50;
+  box-shadow: 0 0 12px #00ff8090;
+  backdrop-filter: blur(3px);
+}
+
+/* Campo nickname */
+.nickBox input {
+  width: 130px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: #000010;
+  color: var(--text);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  outline: none;
+  transition: box-shadow .15s;
+}
+.nickBox input:focus {
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+/* Bottone login */
+.nickBox button {
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 2px solid var(--accent2);
+  background: var(--accent2);
+  color: #000;
+  cursor: pointer;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  transition: transform .1s, filter .1s, box-shadow .1s;
+}
+.nickBox button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.3);
+  box-shadow: 0 0 6px var(--accent2);
+}
+
+/* === SFONDO SPAZIALE ANIMATO === */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #000020 0%, #000010 80%, #000000 100%);
+  background-image:
+    radial-gradient(2px 2px at 20% 30%, #fff, transparent),
+    radial-gradient(1px 1px at 80% 60%, #aaf, transparent),
+    radial-gradient(1px 1px at 40% 80%, #ffb, transparent),
+    radial-gradient(1px 1px at 60% 10%, #fff, transparent),
+    radial-gradient(1px 1px at 90% 50%, #fff, transparent);
+  background-repeat: repeat;
+  animation: starsMove 25s linear infinite;
+  z-index: 0;
+}
+
+@keyframes starsMove {
+  from { background-position: 0 0, 0 0, 0 0, 0 0, 0 0; }
+  to { background-position: 0 2000px, 0 1000px, 0 1500px, 0 1800px, 0 2200px; }
+}
+
+/* linee orizzontali CRT */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(rgba(0,0,0,0.15) 50%, rgba(255,255,255,0.02) 51%);
+  background-size: 100% 3px;
+  opacity: .25;
+  mix-blend-mode: overlay;
+  z-index: 1000;
+}
+
+/* === CORNICE DEL GIOCO === */
+.frame {
+  width: min(760px, 96vw);
+  background: linear-gradient(180deg, rgba(20,20,40,0.9), rgba(0,0,10,0.95));
+  border: 3px solid var(--accent);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 8px;
+  box-shadow: 0 0 15px #ffd27faa, inset 0 0 10px #ffd27f44;
+  position: relative;
+  backdrop-filter: blur(3px);
+  z-index: 2;
+}
+
+/* === CANVAS === */
+.canvas {
+  background-image: url(img/spaceback.gif);
+  padding: 8px;
+  border: 3px solid var(--accent2);
+  border-radius: 6px;
+  box-shadow: 0 0 8px #00ff8070, inset 0 0 5px #000;
+  position: relative;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: transparent;
+  image-rendering: pixelated;
+  cursor: none;
+}
+
+/* === HUD === */
+.hud {
+  width: 100%;
+  color: var(--text);
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  text-shadow: 0 0 3px #000;
+  margin-bottom: 8px;
+  align-items: center;
+  z-index: 10;
+}
+
+.nickname {
+  color: var(--accent2);
+  font-size: 10px;
+}
+
+/* === PULSANTI === */
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  padding: 10px 12px;
+  background: linear-gradient(180deg, #151530, #0a0a20);
+  border: 3px solid #000;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 10px;
+  transition: 0.1s;
+  box-shadow: inset 0 0 5px #000, 0 3px 0 #000;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(180deg, var(--accent), #ff9c5c);
+  color: #000;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* === CONTROLLI TOUCH === */
+.touch-controls {
+  display: none;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.touch-btn {
+  padding: 10px;
+  background: linear-gradient(180deg,#151530,#0a0a20);
+  color: var(--text);
+  border: 3px solid #000;
+  border-radius: 6px;
+  font-size: 12px;
+  flex: 1 1 30%;
+  text-align: center;
+  user-select: none;
+  transition: 0.1s;
+  box-shadow: inset 0 0 5px #000;
+}
+
+.touch-btn:active {
+  background: var(--accent2);
+  color: #000;
+  box-shadow: 0 0 8px var(--accent2);
+}
+
+@media(max-width:760px){
+  .touch-controls{display:flex;}
+}
+
+/* === NAVICELLA E METEORA (PIXEL-STYLE GLOW) === */
+.ship, .meteor {
+  position: absolute;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: transform 0.05s linear;
+}
+
+/* NAVICELLA */
+.ship {
+  width: 64px;
+  height: 64px;
+  background-image: url('img/nav.png'); /* percorso immagine navicella */
+  filter: drop-shadow(0 0 8px rgba(255,255,255,0.3))
+          drop-shadow(0 0 15px rgba(0,255,255,0.4));
+}
+
+.ship:active {
+  transform: scale(1.05);
+}
+
+/* METEORA */
+.meteor {
+  width: 48px;
+  height: 48px;
+  background-image: url('img/meteor.png'); /* percorso immagine meteora */
+  filter: drop-shadow(0 0 5px rgba(255,100,0,0.4))
+          drop-shadow(0 0 15px rgba(255,50,0,0.3));
+}
+
+
+/* === PULSANTE FULLSCREEN === */
+#fullscreenBtn {
+  background-image: url(img/spaceback.gif);  
+  border: 2px solid var(--accent);
+  color: var(--accent);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 4px;
+  transition: 0.15s;
+}
+
+#fullscreenBtn:hover {
+  background-image: url(img/spaceback.gif);
+  box-shadow: 0 0 10px var(--accent);
+}
